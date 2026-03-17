@@ -8,229 +8,504 @@ import { Transaction, TransactionType, TransactionStatus, FinancialSummary, Pagi
   selector: 'app-finance',
   template: `
     <div class="finance-container">
-      <app-page-header title="Finance" subtitle="Financial overview and transactions"></app-page-header>
+      <app-page-header
+        title="Finance"
+        subtitle="Financial overview and transactions"
+        [breadcrumb]="['Dashboard', 'Finance']">
+      </app-page-header>
 
+      <!-- Summary Cards -->
       <div class="summary-cards">
-        <mat-card class="summary-card income">
-          <mat-card-content>
+        <div class="summary-card">
+          <div class="card-icon income">
             <mat-icon>trending_up</mat-icon>
-            <div class="summary-info">
-              <span class="amount">{{ summary?.totalIncome | currencyFormat }}</span>
-              <span class="label">Total Income</span>
-            </div>
-          </mat-card-content>
-        </mat-card>
+          </div>
+          <div class="card-info">
+            <span class="card-amount">{{ summary?.totalIncome | currencyFormat }}</span>
+            <span class="card-label">Total Income</span>
+            <span class="card-trend positive">
+              <mat-icon>arrow_upward</mat-icon>
+              +12.5%
+            </span>
+          </div>
+        </div>
 
-        <mat-card class="summary-card expense">
-          <mat-card-content>
+        <div class="summary-card">
+          <div class="card-icon expense">
             <mat-icon>trending_down</mat-icon>
-            <div class="summary-info">
-              <span class="amount">{{ summary?.totalExpenses | currencyFormat }}</span>
-              <span class="label">Total Expenses</span>
-            </div>
-          </mat-card-content>
-        </mat-card>
+          </div>
+          <div class="card-info">
+            <span class="card-amount">{{ summary?.totalExpenses | currencyFormat }}</span>
+            <span class="card-label">Total Expenses</span>
+            <span class="card-trend negative">
+              <mat-icon>arrow_upward</mat-icon>
+              +8.2%
+            </span>
+          </div>
+        </div>
 
-        <mat-card class="summary-card profit">
-          <mat-card-content>
+        <div class="summary-card">
+          <div class="card-icon profit">
             <mat-icon>account_balance</mat-icon>
-            <div class="summary-info">
-              <span class="amount">{{ summary?.netProfit | currencyFormat }}</span>
-              <span class="label">Net Profit</span>
-            </div>
-          </mat-card-content>
-        </mat-card>
+          </div>
+          <div class="card-info">
+            <span class="card-amount">{{ summary?.netProfit | currencyFormat }}</span>
+            <span class="card-label">Net Profit</span>
+            <span class="card-trend positive">
+              <mat-icon>arrow_upward</mat-icon>
+              +18.3%
+            </span>
+          </div>
+        </div>
 
-        <mat-card class="summary-card pending">
-          <mat-card-content>
+        <div class="summary-card">
+          <div class="card-icon pending">
             <mat-icon>pending_actions</mat-icon>
-            <div class="summary-info">
-              <span class="amount">{{ summary?.pendingPayments | currencyFormat }}</span>
-              <span class="label">Pending Payments</span>
-            </div>
-          </mat-card-content>
-        </mat-card>
+          </div>
+          <div class="card-info">
+            <span class="card-amount">{{ summary?.pendingPayments | currencyFormat }}</span>
+            <span class="card-label">Pending Payments</span>
+            <span class="card-trend neutral">
+              <mat-icon>remove</mat-icon>
+              3 invoices
+            </span>
+          </div>
+        </div>
       </div>
 
-      <mat-card>
-        <mat-card-header>
-          <mat-card-title>Transactions</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
+      <!-- Transactions Table -->
+      <div class="content-card">
+        <div class="card-header">
+          <h3>Recent Transactions</h3>
+          <button class="btn-export">
+            <mat-icon>download</mat-icon>
+            Export
+          </button>
+        </div>
+
+        <div class="card-toolbar">
+          <div class="search-box">
+            <mat-icon>search</mat-icon>
+            <input type="text" (keyup)="onSearch($event)" placeholder="Search transactions...">
+          </div>
+
           <div class="filters">
-            <mat-form-field appearance="outline">
-              <mat-label>Search</mat-label>
-              <input matInput (keyup)="onSearch($event)" placeholder="Search transactions...">
-              <mat-icon matSuffix>search</mat-icon>
-            </mat-form-field>
+            <select (change)="onTypeFilter($any($event.target).value)">
+              <option value="">All Types</option>
+              <option *ngFor="let type of transactionTypes" [value]="type">{{ type }}</option>
+            </select>
 
-            <mat-form-field appearance="outline">
-              <mat-label>Type</mat-label>
-              <mat-select (selectionChange)="onTypeFilter($event.value)">
-                <mat-option value="">All Types</mat-option>
-                <mat-option *ngFor="let type of transactionTypes" [value]="type">{{ type }}</mat-option>
-              </mat-select>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Status</mat-label>
-              <mat-select (selectionChange)="onStatusFilter($event.value)">
-                <mat-option value="">All Statuses</mat-option>
-                <mat-option *ngFor="let status of transactionStatuses" [value]="status">{{ status }}</mat-option>
-              </mat-select>
-            </mat-form-field>
+            <select (change)="onStatusFilter($any($event.target).value)">
+              <option value="">All Statuses</option>
+              <option *ngFor="let status of transactionStatuses" [value]="status">{{ status }}</option>
+            </select>
           </div>
+        </div>
 
-          <div class="table-container">
-            <table mat-table [dataSource]="transactions" matSort (matSortChange)="onSortChange($event)">
-              <ng-container matColumnDef="transactionNumber">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>Transaction #</th>
-                <td mat-cell *matCellDef="let t">{{ t.transactionNumber }}</td>
-              </ng-container>
+        <div class="table-container">
+          <table mat-table [dataSource]="transactions" matSort (matSortChange)="onSortChange($event)">
+            <ng-container matColumnDef="transactionNumber">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Transaction #</th>
+              <td mat-cell *matCellDef="let t">
+                <span class="txn-number">{{ t.transactionNumber }}</span>
+              </td>
+            </ng-container>
 
-              <ng-container matColumnDef="date">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
-                <td mat-cell *matCellDef="let t">{{ t.date | date:'short' }}</td>
-              </ng-container>
+            <ng-container matColumnDef="date">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+              <td mat-cell *matCellDef="let t">{{ t.date | date:'mediumDate' }}</td>
+            </ng-container>
 
-              <ng-container matColumnDef="type">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
-                <td mat-cell *matCellDef="let t">
-                  <span class="type-badge" [ngClass]="'type-' + t.type.toLowerCase()">
-                    <mat-icon>{{ getTypeIcon(t.type) }}</mat-icon>
-                    {{ t.type }}
-                  </span>
-                </td>
-              </ng-container>
+            <ng-container matColumnDef="type">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+              <td mat-cell *matCellDef="let t">
+                <span class="type-badge" [ngClass]="'type-' + t.type.toLowerCase()">
+                  <mat-icon>{{ getTypeIcon(t.type) }}</mat-icon>
+                  {{ t.type }}
+                </span>
+              </td>
+            </ng-container>
 
-              <ng-container matColumnDef="category">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>Category</th>
-                <td mat-cell *matCellDef="let t">{{ t.category }}</td>
-              </ng-container>
+            <ng-container matColumnDef="category">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Category</th>
+              <td mat-cell *matCellDef="let t">{{ t.category }}</td>
+            </ng-container>
 
-              <ng-container matColumnDef="description">
-                <th mat-header-cell *matHeaderCellDef>Description</th>
-                <td mat-cell *matCellDef="let t">{{ t.description | truncate:40 }}</td>
-              </ng-container>
+            <ng-container matColumnDef="description">
+              <th mat-header-cell *matHeaderCellDef>Description</th>
+              <td mat-cell *matCellDef="let t">{{ t.description | truncate:40 }}</td>
+            </ng-container>
 
-              <ng-container matColumnDef="amount">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>Amount</th>
-                <td mat-cell *matCellDef="let t" [ngClass]="getAmountClass(t.type)">
-                  {{ t.type === 'Expense' ? '-' : '+' }}{{ t.amount | currencyFormat }}
-                </td>
-              </ng-container>
+            <ng-container matColumnDef="amount">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Amount</th>
+              <td mat-cell *matCellDef="let t" [ngClass]="getAmountClass(t.type)">
+                {{ t.type === 'Expense' ? '-' : '+' }}{{ t.amount | currencyFormat }}
+              </td>
+            </ng-container>
 
-              <ng-container matColumnDef="status">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
-                <td mat-cell *matCellDef="let t">
-                  <span class="status-badge" [ngClass]="'status-' + t.status.toLowerCase()">
-                    {{ t.status }}
-                  </span>
-                </td>
-              </ng-container>
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+              <td mat-cell *matCellDef="let t">
+                <span class="status-badge" [ngClass]="'status-' + t.status.toLowerCase()">
+                  <span class="status-dot"></span>
+                  {{ t.status }}
+                </span>
+              </td>
+            </ng-container>
 
-              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
-              <tr class="mat-row" *matNoDataRow>
-                <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">
-                  No transactions found
-                </td>
-              </tr>
-            </table>
-          </div>
+            <tr class="mat-row" *matNoDataRow>
+              <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">
+                <div class="empty-state">
+                  <mat-icon>receipt_long</mat-icon>
+                  <span>No transactions found</span>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
 
-          <mat-paginator
-            [length]="totalItems"
-            [pageSize]="pageSize"
-            [pageSizeOptions]="[5, 10, 25, 50]"
-            [pageIndex]="pageIndex"
-            (page)="onPageChange($event)"
-            showFirstLastButtons>
-          </mat-paginator>
-        </mat-card-content>
-      </mat-card>
+        <mat-paginator
+          [length]="totalItems"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="[5, 10, 25, 50]"
+          [pageIndex]="pageIndex"
+          (page)="onPageChange($event)"
+          showFirstLastButtons>
+        </mat-paginator>
+      </div>
     </div>
   `,
   styles: [`
     .summary-cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 24px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
       margin-bottom: 24px;
     }
-    .summary-card mat-card-content {
+
+    .summary-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      gap: 16px;
+    }
+
+    .card-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
       display: flex;
       align-items: center;
-      gap: 16px;
-      padding: 16px !important;
+      justify-content: center;
     }
-    .summary-card mat-icon {
-      font-size: 40px;
-      width: 40px;
-      height: 40px;
+
+    .card-icon mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
     }
-    .summary-card.income mat-icon { color: #4caf50; }
-    .summary-card.expense mat-icon { color: #f44336; }
-    .summary-card.profit mat-icon { color: #2196f3; }
-    .summary-card.pending mat-icon { color: #ff9800; }
-    .summary-info {
+
+    .card-icon.income {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success-color);
+    }
+
+    .card-icon.expense {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--danger-color);
+    }
+
+    .card-icon.profit {
+      background: rgba(59, 130, 246, 0.15);
+      color: var(--info-color);
+    }
+
+    .card-icon.pending {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--warning-color);
+    }
+
+    .card-info {
       display: flex;
       flex-direction: column;
+      flex: 1;
     }
-    .summary-info .amount {
+
+    .card-amount {
       font-size: 24px;
-      font-weight: 600;
+      font-weight: 700;
+      color: var(--text-primary);
     }
-    .summary-info .label {
-      font-size: 14px;
-      color: rgba(0, 0, 0, 0.6);
+
+    .card-label {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
     }
-    .filters {
+
+    .card-trend {
       display: flex;
-      gap: 16px;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-    }
-    .filters mat-form-field {
-      min-width: 200px;
-    }
-    .table-container {
-      overflow-x: auto;
-    }
-    table {
-      width: 100%;
-    }
-    .type-badge {
-      display: inline-flex;
       align-items: center;
       gap: 4px;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-    }
-    .type-badge mat-icon {
-      font-size: 16px;
-      width: 16px;
-      height: 16px;
-    }
-    .type-income { background: #e8f5e9; color: #2e7d32; }
-    .type-expense { background: #ffebee; color: #c62828; }
-    .type-transfer { background: #e3f2fd; color: #1565c0; }
-    .amount-income { color: #2e7d32; font-weight: 500; }
-    .amount-expense { color: #c62828; font-weight: 500; }
-    .status-badge {
-      padding: 4px 12px;
-      border-radius: 16px;
       font-size: 12px;
       font-weight: 500;
     }
-    .status-pending { background: #fff3e0; color: #e65100; }
-    .status-completed { background: #e8f5e9; color: #2e7d32; }
-    .status-cancelled { background: #ffebee; color: #c62828; }
+
+    .card-trend mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+    }
+
+    .card-trend.positive {
+      color: var(--success-color);
+    }
+
+    .card-trend.negative {
+      color: var(--danger-color);
+    }
+
+    .card-trend.neutral {
+      color: var(--text-muted);
+    }
+
+    .content-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .card-header h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .btn-export {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: transparent;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-secondary);
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-export:hover {
+      background: var(--card-bg-hover);
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    .btn-export mat-icon {
+      font-size: 18px;
+    }
+
+    .card-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      border-bottom: 1px solid var(--border-color);
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--secondary-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px 16px;
+      min-width: 280px;
+    }
+
+    .search-box:focus-within {
+      border-color: var(--primary-color);
+    }
+
+    .search-box mat-icon {
+      color: var(--text-muted);
+    }
+
+    .search-box input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-primary);
+      font-size: 14px;
+    }
+
+    .filters {
+      display: flex;
+      gap: 12px;
+    }
+
+    .filters select {
+      background: var(--secondary-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text-primary);
+      font-size: 14px;
+      min-width: 140px;
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+    }
+
+    .txn-number {
+      font-family: monospace;
+      font-size: 13px;
+      color: var(--text-secondary);
+      background: var(--secondary-bg);
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+
+    .type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .type-badge mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+    }
+
+    .type-income {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success-color);
+    }
+
+    .type-expense {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--danger-color);
+    }
+
+    .type-transfer {
+      background: rgba(59, 130, 246, 0.15);
+      color: var(--info-color);
+    }
+
+    .amount-income {
+      color: var(--success-color);
+      font-weight: 600;
+    }
+
+    .amount-expense {
+      color: var(--danger-color);
+      font-weight: 600;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .status-pending {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--warning-color);
+    }
+
+    .status-completed {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success-color);
+    }
+
+    .status-cancelled {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--danger-color);
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px;
+      color: var(--text-muted);
+    }
+
+    .empty-state mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
+
     .no-data {
       text-align: center;
-      padding: 48px;
+    }
+
+    @media (max-width: 1200px) {
+      .summary-cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .summary-cards {
+        grid-template-columns: 1fr;
+      }
+
+      .card-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .search-box {
+        min-width: 100%;
+      }
+
+      .filters {
+        flex-wrap: wrap;
+      }
     }
   `]
 })

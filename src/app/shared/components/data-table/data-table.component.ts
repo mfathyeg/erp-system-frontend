@@ -16,11 +16,14 @@ export interface TableColumn {
   template: `
     <div class="table-container">
       <div class="table-toolbar" *ngIf="showSearch || showFilter">
-        <mat-form-field *ngIf="showSearch" appearance="outline" class="search-field">
-          <mat-label>Search</mat-label>
-          <input matInput (keyup)="applyFilter($event)" placeholder="Search..." #searchInput>
-          <mat-icon matSuffix>search</mat-icon>
-        </mat-form-field>
+        <div class="search-box" *ngIf="showSearch">
+          <mat-icon>search</mat-icon>
+          <input
+            type="text"
+            (keyup)="applyFilter($event)"
+            placeholder="Search..."
+            #searchInput>
+        </div>
         <ng-content select="[filters]"></ng-content>
       </div>
 
@@ -57,15 +60,17 @@ export interface TableColumn {
           <ng-container matColumnDef="actions" *ngIf="showActions">
             <th mat-header-cell *matHeaderCellDef>Actions</th>
             <td mat-cell *matCellDef="let row">
-              <button mat-icon-button *ngIf="showView" (click)="onView.emit(row)" matTooltip="View">
-                <mat-icon>visibility</mat-icon>
-              </button>
-              <button mat-icon-button *ngIf="showEdit" (click)="onEdit.emit(row)" matTooltip="Edit">
-                <mat-icon>edit</mat-icon>
-              </button>
-              <button mat-icon-button *ngIf="showDelete" (click)="onDelete.emit(row)" matTooltip="Delete" color="warn">
-                <mat-icon>delete</mat-icon>
-              </button>
+              <div class="action-buttons">
+                <button class="action-btn view" *ngIf="showView" (click)="onView.emit(row)" matTooltip="View">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+                <button class="action-btn edit" *ngIf="showEdit" (click)="onEdit.emit(row)" matTooltip="Edit">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button class="action-btn delete" *ngIf="showDelete" (click)="onDelete.emit(row)" matTooltip="Delete">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
             </td>
           </ng-container>
 
@@ -76,7 +81,10 @@ export interface TableColumn {
 
           <tr class="mat-row" *matNoDataRow>
             <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">
-              {{ noDataMessage }}
+              <div class="empty-table">
+                <mat-icon>inbox</mat-icon>
+                <span>{{ noDataMessage }}</span>
+              </div>
             </td>
           </tr>
         </table>
@@ -95,46 +103,166 @@ export interface TableColumn {
   `,
   styles: [`
     .table-container {
-      background: white;
-      border-radius: 4px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
       overflow: hidden;
     }
+
     .table-toolbar {
-      padding: 16px;
+      padding: 20px;
       display: flex;
       gap: 16px;
       align-items: center;
       flex-wrap: wrap;
+      border-bottom: 1px solid var(--border-color);
     }
-    .search-field {
-      min-width: 250px;
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--secondary-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px 16px;
+      min-width: 280px;
+      transition: all 0.2s ease;
     }
+
+    .search-box:focus-within {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .search-box mat-icon {
+      color: var(--text-muted);
+      font-size: 20px;
+    }
+
+    .search-box input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-primary);
+      font-size: 14px;
+    }
+
+    .search-box input::placeholder {
+      color: var(--text-muted);
+    }
+
     .table-wrapper {
       overflow-x: auto;
     }
+
     table {
       width: 100%;
     }
+
     .status-badge {
+      display: inline-flex;
       padding: 4px 12px;
-      border-radius: 16px;
+      border-radius: 20px;
       font-size: 12px;
       font-weight: 500;
     }
-    .status-pending { background: #fff3e0; color: #e65100; }
-    .status-completed, .status-delivered, .status-paid { background: #e8f5e9; color: #2e7d32; }
-    .status-cancelled, .status-error { background: #ffebee; color: #c62828; }
-    .status-processing, .status-shipped { background: #e3f2fd; color: #1565c0; }
+
+    .status-pending {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--warning-color);
+    }
+
+    .status-completed, .status-delivered, .status-paid, .status-active {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success-color);
+    }
+
+    .status-cancelled, .status-error, .status-inactive {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--danger-color);
+    }
+
+    .status-processing, .status-shipped {
+      background: rgba(59, 130, 246, 0.15);
+      color: var(--info-color);
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 4px;
+    }
+
+    .action-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+      background: var(--card-bg-hover);
+    }
+
+    .action-btn.view:hover {
+      color: var(--info-color);
+    }
+
+    .action-btn.edit:hover {
+      color: var(--primary-color);
+    }
+
+    .action-btn.delete:hover {
+      color: var(--danger-color);
+    }
+
+    .action-btn mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    .empty-table {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px;
+      color: var(--text-muted);
+    }
+
+    .empty-table mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
+
     .no-data {
       text-align: center;
-      padding: 48px;
-      color: rgba(0, 0, 0, 0.6);
     }
+
     .clickable {
       cursor: pointer;
     }
+
     .clickable:hover {
-      background: rgba(0, 0, 0, 0.04);
+      background: var(--card-bg-hover) !important;
+    }
+
+    @media (max-width: 768px) {
+      .search-box {
+        min-width: 100%;
+      }
     }
   `]
 })

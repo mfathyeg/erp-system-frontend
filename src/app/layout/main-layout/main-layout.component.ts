@@ -8,67 +8,102 @@ import { SignalRService } from '../../core/services/signalr.service';
 @Component({
   selector: 'app-main-layout',
   template: `
-    <div class="layout-container">
+    <div class="layout-wrapper">
       <app-navbar (toggleMenu)="toggleSidenav()"></app-navbar>
 
-      <mat-sidenav-container class="sidenav-container">
-        <mat-sidenav
-          #sidenav
-          [mode]="isMobile ? 'over' : 'side'"
-          [opened]="!isMobile"
-          class="sidenav">
-          <app-sidebar
-            [collapsed]="sidebarCollapsed"
-            (toggleSidebar)="toggleSidebarCollapse()"
-            (navItemClicked)="onNavItemClicked()">
-          </app-sidebar>
-        </mat-sidenav>
+      <div class="layout-container">
+        <mat-sidenav-container class="sidenav-container">
+          <mat-sidenav
+            #sidenav
+            [mode]="isMobile ? 'over' : 'side'"
+            [opened]="!isMobile"
+            class="sidenav">
+            <app-sidebar
+              [collapsed]="sidebarCollapsed"
+              (toggleSidebar)="toggleSidebarCollapse()"
+              (navItemClicked)="onNavItemClicked()">
+            </app-sidebar>
+          </mat-sidenav>
 
-        <mat-sidenav-content class="content" [style.margin-left]="getContentMargin()">
-          <mat-progress-bar
-            *ngIf="isLoading"
-            mode="indeterminate"
-            class="loading-bar">
-          </mat-progress-bar>
+          <mat-sidenav-content class="main-content" [style.margin-left]="getContentMargin()">
+            <!-- Loading Bar -->
+            <div class="loading-bar" *ngIf="isLoading">
+              <div class="loading-progress"></div>
+            </div>
 
-          <div class="page-content">
-            <router-outlet></router-outlet>
-          </div>
-        </mat-sidenav-content>
-      </mat-sidenav-container>
+            <div class="page-wrapper">
+              <router-outlet></router-outlet>
+            </div>
+          </mat-sidenav-content>
+        </mat-sidenav-container>
+      </div>
     </div>
   `,
   styles: [`
+    .layout-wrapper {
+      min-height: 100vh;
+      background: var(--primary-bg);
+    }
+
     .layout-container {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
+      padding-top: 70px;
+      min-height: calc(100vh - 70px);
     }
+
     .sidenav-container {
-      flex: 1;
-      margin-top: 64px;
+      min-height: calc(100vh - 70px);
+      background: transparent;
     }
+
     .sidenav {
       background: transparent;
       border: none;
     }
-    .content {
-      transition: margin-left 0.3s ease;
-      background: #f5f5f5;
-      min-height: calc(100vh - 64px);
+
+    .main-content {
+      background: var(--primary-bg);
+      min-height: calc(100vh - 70px);
+      transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
+
+    .page-wrapper {
+      padding: 24px;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
     .loading-bar {
       position: fixed;
-      top: 64px;
+      top: 70px;
       left: 0;
       right: 0;
+      height: 3px;
+      background: var(--border-color);
       z-index: 999;
+      overflow: hidden;
     }
-    .page-content {
-      padding: 24px;
+
+    .loading-progress {
+      height: 100%;
+      width: 30%;
+      background: var(--gradient-primary);
+      animation: loading 1.5s ease-in-out infinite;
     }
+
+    @keyframes loading {
+      0% {
+        transform: translateX(-100%);
+      }
+      50% {
+        transform: translateX(200%);
+      }
+      100% {
+        transform: translateX(-100%);
+      }
+    }
+
     @media (max-width: 768px) {
-      .page-content {
+      .page-wrapper {
         padding: 16px;
       }
     }
@@ -129,6 +164,6 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
 
   getContentMargin(): string {
     if (this.isMobile) return '0';
-    return this.sidebarCollapsed ? '64px' : '260px';
+    return this.sidebarCollapsed ? '80px' : '280px';
   }
 }

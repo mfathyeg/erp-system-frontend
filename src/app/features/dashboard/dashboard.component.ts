@@ -1,395 +1,830 @@
 import { Component, OnInit } from '@angular/core';
-import { ApiService } from '../../core/services/api.service';
-import { DashboardStats } from '../../core/models';
+
+interface StatCard {
+  title: string;
+  value: string;
+  change: number;
+  changeLabel: string;
+  icon: string;
+  gradient: string;
+}
+
+interface RecentOrder {
+  id: string;
+  customer: string;
+  avatar: string;
+  product: string;
+  amount: number;
+  status: string;
+  date: Date;
+}
+
+interface TopProduct {
+  name: string;
+  category: string;
+  sales: number;
+  revenue: number;
+  progress: number;
+  trend: 'up' | 'down';
+}
+
+interface TeamMember {
+  name: string;
+  role: string;
+  avatar: string;
+  tasks: number;
+  completedTasks: number;
+  status: 'online' | 'busy' | 'offline';
+}
 
 @Component({
   selector: 'app-dashboard',
   template: `
-    <div class="dashboard-container">
-      <app-page-header title="Dashboard" subtitle="Overview of your ERP system"></app-page-header>
-
-      <div class="stats-grid">
-        <mat-card class="stat-card">
-          <mat-card-content>
-            <div class="stat-icon orders">
-              <mat-icon>shopping_cart</mat-icon>
-            </div>
-            <div class="stat-info">
-              <span class="stat-value">{{ stats?.totalOrders || 0 }}</span>
-              <span class="stat-label">Total Orders</span>
-            </div>
-          </mat-card-content>
-        </mat-card>
-
-        <mat-card class="stat-card">
-          <mat-card-content>
-            <div class="stat-icon pending">
-              <mat-icon>pending_actions</mat-icon>
-            </div>
-            <div class="stat-info">
-              <span class="stat-value">{{ stats?.pendingOrders || 0 }}</span>
-              <span class="stat-label">Pending Orders</span>
-            </div>
-          </mat-card-content>
-        </mat-card>
-
-        <mat-card class="stat-card">
-          <mat-card-content>
-            <div class="stat-icon revenue">
-              <mat-icon>attach_money</mat-icon>
-            </div>
-            <div class="stat-info">
-              <span class="stat-value">{{ stats?.totalRevenue | currencyFormat }}</span>
-              <span class="stat-label">Total Revenue</span>
-            </div>
-          </mat-card-content>
-        </mat-card>
-
-        <mat-card class="stat-card">
-          <mat-card-content>
-            <div class="stat-icon inventory">
-              <mat-icon>warning</mat-icon>
-            </div>
-            <div class="stat-info">
-              <span class="stat-value">{{ stats?.lowStockItems || 0 }}</span>
-              <span class="stat-label">Low Stock Items</span>
-            </div>
-          </mat-card-content>
-        </mat-card>
+    <div class="dashboard">
+      <!-- Header -->
+      <div class="dashboard-header">
+        <div class="header-content">
+          <h1>Welcome back, John!</h1>
+          <p>Here's what's happening with your business today.</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn-outline">
+            <mat-icon>download</mat-icon>
+            Export Report
+          </button>
+          <button class="btn-gradient">
+            <mat-icon>add</mat-icon>
+            New Order
+          </button>
+        </div>
       </div>
 
-      <div class="charts-row">
-        <mat-card class="chart-card">
-          <mat-card-header>
-            <mat-card-title>Recent Orders</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <table mat-table [dataSource]="stats?.recentOrders || []" class="recent-orders-table">
-              <ng-container matColumnDef="orderNumber">
-                <th mat-header-cell *matHeaderCellDef>Order #</th>
-                <td mat-cell *matCellDef="let order">{{ order.orderNumber }}</td>
-              </ng-container>
-
-              <ng-container matColumnDef="customerName">
-                <th mat-header-cell *matHeaderCellDef>Customer</th>
-                <td mat-cell *matCellDef="let order">{{ order.customerName }}</td>
-              </ng-container>
-
-              <ng-container matColumnDef="amount">
-                <th mat-header-cell *matHeaderCellDef>Amount</th>
-                <td mat-cell *matCellDef="let order">{{ order.amount | currencyFormat }}</td>
-              </ng-container>
-
-              <ng-container matColumnDef="status">
-                <th mat-header-cell *matHeaderCellDef>Status</th>
-                <td mat-cell *matCellDef="let order">
-                  <span class="status-badge" [ngClass]="'status-' + order.status.toLowerCase()">
-                    {{ order.status }}
-                  </span>
-                </td>
-              </ng-container>
-
-              <ng-container matColumnDef="date">
-                <th mat-header-cell *matHeaderCellDef>Date</th>
-                <td mat-cell *matCellDef="let order">{{ order.date | date:'short' }}</td>
-              </ng-container>
-
-              <tr mat-header-row *matHeaderRowDef="recentOrderColumns"></tr>
-              <tr mat-row *matRowDef="let row; columns: recentOrderColumns;"></tr>
-            </table>
-
-            <div class="view-all">
-              <a mat-button color="primary" routerLink="/orders">View All Orders</a>
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+        <div class="stat-card" *ngFor="let stat of stats" [class]="stat.gradient">
+          <div class="stat-content">
+            <div class="stat-info">
+              <span class="stat-title">{{ stat.title }}</span>
+              <h2 class="stat-value">{{ stat.value }}</h2>
+              <div class="stat-change" [class.positive]="stat.change > 0" [class.negative]="stat.change < 0">
+                <mat-icon>{{ stat.change > 0 ? 'trending_up' : 'trending_down' }}</mat-icon>
+                <span>{{ stat.change > 0 ? '+' : '' }}{{ stat.change }}% {{ stat.changeLabel }}</span>
+              </div>
             </div>
-          </mat-card-content>
-        </mat-card>
+            <div class="stat-icon-wrapper" [class]="stat.gradient">
+              <mat-icon>{{ stat.icon }}</mat-icon>
+            </div>
+          </div>
+          <div class="stat-chart">
+            <svg viewBox="0 0 100 30" preserveAspectRatio="none">
+              <path [attr.d]="getSparkline()" fill="none" stroke="currentColor" stroke-width="2" opacity="0.3"/>
+            </svg>
+          </div>
+        </div>
+      </div>
 
-        <mat-card class="chart-card">
-          <mat-card-header>
-            <mat-card-title>Order Status Distribution</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <div class="status-distribution">
-              <div class="status-item" *ngFor="let status of stats?.orderStatusDistribution">
-                <div class="status-bar">
-                  <div class="status-fill"
-                       [ngClass]="'status-' + status.status.toLowerCase()"
-                       [style.width]="getStatusPercentage(status.count) + '%'">
+      <!-- Main Content Grid -->
+      <div class="content-grid">
+        <!-- Recent Orders -->
+        <div class="card orders-card">
+          <div class="card-header">
+            <h3>Recent Orders</h3>
+            <button class="btn-text">View All</button>
+          </div>
+          <div class="orders-table">
+            <div class="order-row" *ngFor="let order of recentOrders">
+              <div class="order-customer">
+                <img [src]="order.avatar" [alt]="order.customer" class="avatar">
+                <div class="customer-info">
+                  <span class="customer-name">{{ order.customer }}</span>
+                  <span class="order-id">{{ order.id }}</span>
+                </div>
+              </div>
+              <div class="order-product">{{ order.product }}</div>
+              <div class="order-amount">{{ order.amount | currency }}</div>
+              <div class="order-status">
+                <span class="status-badge" [class]="order.status.toLowerCase()">{{ order.status }}</span>
+              </div>
+              <div class="order-date">{{ order.date | date:'MMM d' }}</div>
+              <button class="action-btn">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Revenue Chart -->
+        <div class="card chart-card">
+          <div class="card-header">
+            <div>
+              <h3>Revenue Overview</h3>
+              <p class="card-subtitle">Monthly revenue comparison</p>
+            </div>
+            <div class="chart-legend">
+              <span class="legend-item"><span class="dot primary"></span> This Year</span>
+              <span class="legend-item"><span class="dot secondary"></span> Last Year</span>
+            </div>
+          </div>
+          <div class="chart-container">
+            <div class="chart-bars">
+              <div class="bar-group" *ngFor="let month of chartData">
+                <div class="bar primary" [style.height]="month.current + '%'"></div>
+                <div class="bar secondary" [style.height]="month.previous + '%'"></div>
+                <span class="bar-label">{{ month.label }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top Products -->
+        <div class="card products-card">
+          <div class="card-header">
+            <h3>Top Products</h3>
+            <button class="btn-text">View All</button>
+          </div>
+          <div class="products-list">
+            <div class="product-item" *ngFor="let product of topProducts">
+              <div class="product-info">
+                <span class="product-name">{{ product.name }}</span>
+                <span class="product-category">{{ product.category }}</span>
+              </div>
+              <div class="product-stats">
+                <div class="product-sales">
+                  <span class="sales-count">{{ product.sales }}</span>
+                  <span class="sales-label">sales</span>
+                </div>
+                <div class="product-revenue">{{ product.revenue | currency }}</div>
+              </div>
+              <div class="product-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill primary" [style.width]="product.progress + '%'"></div>
+                </div>
+                <span class="progress-value" [class.up]="product.trend === 'up'" [class.down]="product.trend === 'down'">
+                  <mat-icon>{{ product.trend === 'up' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+                  {{ product.progress }}%
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Team Performance -->
+        <div class="card team-card">
+          <div class="card-header">
+            <h3>Team Performance</h3>
+            <button class="btn-text">View All</button>
+          </div>
+          <div class="team-list">
+            <div class="team-member" *ngFor="let member of teamMembers">
+              <div class="member-info">
+                <div class="member-avatar">
+                  <img [src]="member.avatar" [alt]="member.name">
+                  <span class="status-dot" [class]="member.status"></span>
+                </div>
+                <div class="member-details">
+                  <span class="member-name">{{ member.name }}</span>
+                  <span class="member-role">{{ member.role }}</span>
+                </div>
+              </div>
+              <div class="member-tasks">
+                <div class="tasks-progress">
+                  <span class="tasks-count">{{ member.completedTasks }}/{{ member.tasks }}</span>
+                  <div class="progress-bar small">
+                    <div class="progress-fill success" [style.width]="(member.completedTasks / member.tasks * 100) + '%'"></div>
                   </div>
                 </div>
-                <div class="status-details">
-                  <span class="status-name">{{ status.status }}</span>
-                  <span class="status-count">{{ status.count }}</span>
-                </div>
               </div>
             </div>
-          </mat-card-content>
-        </mat-card>
-      </div>
-
-      <div class="bottom-row">
-        <mat-card class="chart-card">
-          <mat-card-header>
-            <mat-card-title>Top Products</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <mat-list>
-              <mat-list-item *ngFor="let product of stats?.topProducts; let i = index">
-                <span matListItemTitle>
-                  <span class="rank">{{ i + 1 }}</span>
-                  {{ product.productName }}
-                </span>
-                <span matListItemLine>
-                  {{ product.totalSold }} sold - {{ product.revenue | currencyFormat }}
-                </span>
-              </mat-list-item>
-            </mat-list>
-          </mat-card-content>
-        </mat-card>
-
-        <mat-card class="chart-card">
-          <mat-card-header>
-            <mat-card-title>Monthly Sales</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <div class="sales-chart">
-              <div class="chart-bar" *ngFor="let sale of stats?.salesByMonth">
-                <div class="bar-fill" [style.height]="getSalesHeight(sale.revenue) + '%'"></div>
-                <span class="bar-label">{{ sale.month }}</span>
-              </div>
-            </div>
-          </mat-card-content>
-        </mat-card>
+          </div>
+        </div>
       </div>
     </div>
   `,
   styles: [`
-    .dashboard-container {
-      max-width: 1400px;
-      margin: 0 auto;
+    .dashboard {
+      animation: fadeIn 0.3s ease;
     }
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 24px;
-      margin-bottom: 24px;
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-    .stat-card mat-card-content {
+
+    /* Header */
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+    }
+
+    .header-content h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .header-content p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 15px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-outline {
       display: flex;
       align-items: center;
-      gap: 16px;
-      padding: 16px !important;
+      gap: 8px;
+      padding: 10px 20px;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      background: transparent;
+      color: var(--text-primary);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
     }
-    .stat-icon {
+
+    .btn-outline:hover {
+      background: var(--card-bg);
+      border-color: var(--primary-color);
+    }
+
+    .btn-gradient {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      background: var(--gradient-primary);
+      color: white;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-gradient:hover {
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .btn-text {
+      background: none;
+      border: none;
+      color: var(--primary-color);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .stat-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      position: relative;
+      z-index: 1;
+    }
+
+    .stat-title {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+      margin: 8px 0;
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .stat-change {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 13px;
+    }
+
+    .stat-change mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+
+    .stat-change.positive { color: var(--success-color); }
+    .stat-change.negative { color: var(--danger-color); }
+
+    .stat-icon-wrapper {
       width: 56px;
       height: 56px;
-      border-radius: 12px;
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    .stat-icon mat-icon {
+
+    .stat-icon-wrapper mat-icon {
       font-size: 28px;
       width: 28px;
       height: 28px;
       color: white;
     }
-    .stat-icon.orders { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-    .stat-icon.pending { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-    .stat-icon.revenue { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-    .stat-icon.inventory { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
-    .stat-info {
-      display: flex;
-      flex-direction: column;
+
+    .stat-icon-wrapper.primary { background: var(--gradient-primary); }
+    .stat-icon-wrapper.success { background: var(--gradient-success); }
+    .stat-icon-wrapper.warning { background: var(--gradient-warning); }
+    .stat-icon-wrapper.info { background: var(--gradient-info); }
+    .stat-icon-wrapper.purple { background: var(--gradient-purple); }
+    .stat-icon-wrapper.pink { background: var(--gradient-pink); }
+
+    .stat-chart {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 40px;
+      opacity: 0.5;
     }
-    .stat-value {
-      font-size: 24px;
-      font-weight: 600;
+
+    .stat-chart svg {
+      width: 100%;
+      height: 100%;
     }
-    .stat-label {
-      color: rgba(0, 0, 0, 0.6);
-      font-size: 14px;
-    }
-    .charts-row, .bottom-row {
+
+    .stat-card.primary .stat-chart { color: var(--primary-color); }
+    .stat-card.success .stat-chart { color: var(--success-color); }
+    .stat-card.warning .stat-chart { color: var(--warning-color); }
+    .stat-card.info .stat-chart { color: var(--info-color); }
+
+    /* Content Grid */
+    .content-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      grid-template-columns: 1.5fr 1fr;
       gap: 24px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 24px;
     }
-    .chart-card {
-      min-height: 300px;
+
+    .card-header h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
     }
-    .recent-orders-table {
-      width: 100%;
+
+    .card-subtitle {
+      margin: 4px 0 0;
+      font-size: 13px;
+      color: var(--text-muted);
     }
+
+    /* Orders Table */
+    .orders-card {
+      grid-column: 1 / 2;
+    }
+
+    .order-row {
+      display: grid;
+      grid-template-columns: 2fr 1.5fr 1fr 1fr 0.8fr 40px;
+      align-items: center;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .order-row:last-child {
+      border-bottom: none;
+    }
+
+    .order-customer {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      object-fit: cover;
+    }
+
+    .customer-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .customer-name {
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .order-id {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .order-product {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .order-amount {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
     .status-badge {
-      padding: 4px 12px;
-      border-radius: 16px;
+      padding: 6px 12px;
+      border-radius: 8px;
       font-size: 12px;
       font-weight: 500;
     }
-    .status-pending { background: #fff3e0; color: #e65100; }
-    .status-processing { background: #e3f2fd; color: #1565c0; }
-    .status-shipped { background: #e8f5e9; color: #2e7d32; }
-    .status-delivered { background: #e8f5e9; color: #2e7d32; }
-    .status-cancelled { background: #ffebee; color: #c62828; }
-    .view-all {
-      text-align: center;
-      margin-top: 16px;
+
+    .status-badge.pending { background: rgba(245, 158, 11, 0.15); color: var(--warning-color); }
+    .status-badge.processing { background: rgba(59, 130, 246, 0.15); color: var(--info-color); }
+    .status-badge.shipped { background: rgba(139, 92, 246, 0.15); color: var(--accent-color); }
+    .status-badge.delivered { background: rgba(16, 185, 129, 0.15); color: var(--success-color); }
+    .status-badge.cancelled { background: rgba(239, 68, 68, 0.15); color: var(--danger-color); }
+
+    .order-date {
+      color: var(--text-muted);
+      font-size: 13px;
     }
-    .status-distribution {
+
+    .action-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
       display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    .status-item {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .status-bar {
-      height: 8px;
-      background: #e0e0e0;
-      border-radius: 4px;
-      overflow: hidden;
-    }
-    .status-fill {
-      height: 100%;
-      border-radius: 4px;
-      transition: width 0.3s ease;
-    }
-    .status-fill.status-pending { background: #ff9800; }
-    .status-fill.status-processing { background: #2196f3; }
-    .status-fill.status-shipped { background: #9c27b0; }
-    .status-fill.status-delivered { background: #4caf50; }
-    .status-fill.status-cancelled { background: #f44336; }
-    .status-details {
-      display: flex;
-      justify-content: space-between;
-      font-size: 12px;
-    }
-    .status-name {
-      color: rgba(0, 0, 0, 0.6);
-    }
-    .status-count {
-      font-weight: 500;
-    }
-    .rank {
-      display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 24px;
-      height: 24px;
-      background: #e3f2fd;
-      border-radius: 50%;
-      margin-right: 8px;
-      font-size: 12px;
-      font-weight: 600;
-      color: #1976d2;
+      transition: all 0.2s ease;
     }
-    .sales-chart {
+
+    .action-btn:hover {
+      background: var(--card-bg-hover);
+      color: var(--text-primary);
+    }
+
+    /* Chart Card */
+    .chart-card {
+      grid-column: 2 / 3;
+      grid-row: 1 / 2;
+    }
+
+    .chart-legend {
       display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      height: 200px;
-      padding: 16px 0;
+      gap: 16px;
     }
-    .chart-bar {
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .dot.primary { background: var(--primary-color); }
+    .dot.secondary { background: var(--border-light); }
+
+    .chart-container {
+      height: 200px;
+      margin-top: 16px;
+    }
+
+    .chart-bars {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      height: 100%;
+      gap: 8px;
+    }
+
+    .bar-group {
+      flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
-      flex: 1;
+      gap: 8px;
+      height: 100%;
     }
-    .bar-fill {
-      width: 32px;
-      background: linear-gradient(180deg, #1976d2 0%, #64b5f6 100%);
-      border-radius: 4px 4px 0 0;
-      transition: height 0.3s ease;
+
+    .bar-group .bar {
+      width: 100%;
+      max-width: 24px;
+      border-radius: 4px;
+      transition: height 0.5s ease;
     }
+
+    .bar.primary { background: var(--gradient-primary); }
+    .bar.secondary { background: var(--border-light); }
+
     .bar-label {
-      margin-top: 8px;
-      font-size: 12px;
-      color: rgba(0, 0, 0, 0.6);
+      font-size: 11px;
+      color: var(--text-muted);
     }
-    @media (max-width: 600px) {
-      .charts-row, .bottom-row {
+
+    /* Products Card */
+    .products-card {
+      grid-column: 1 / 2;
+    }
+
+    .product-item {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      align-items: center;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .product-item:last-child {
+      border-bottom: none;
+    }
+
+    .product-name {
+      font-weight: 500;
+      color: var(--text-primary);
+      display: block;
+    }
+
+    .product-category {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .product-stats {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .sales-count {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .sales-label {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .product-revenue {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .product-progress {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .progress-bar {
+      flex: 1;
+      height: 6px;
+      background: var(--border-color);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-bar.small {
+      height: 4px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.5s ease;
+    }
+
+    .progress-fill.primary { background: var(--gradient-primary); }
+    .progress-fill.success { background: var(--gradient-success); }
+
+    .progress-value {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      font-size: 12px;
+      font-weight: 500;
+      min-width: 50px;
+    }
+
+    .progress-value mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+    }
+
+    .progress-value.up { color: var(--success-color); }
+    .progress-value.down { color: var(--danger-color); }
+
+    /* Team Card */
+    .team-card {
+      grid-column: 2 / 3;
+    }
+
+    .team-member {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .team-member:last-child {
+      border-bottom: none;
+    }
+
+    .member-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .member-avatar {
+      position: relative;
+      width: 40px;
+      height: 40px;
+    }
+
+    .member-avatar img {
+      width: 100%;
+      height: 100%;
+      border-radius: 10px;
+      object-fit: cover;
+    }
+
+    .status-dot {
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 2px solid var(--card-bg);
+    }
+
+    .status-dot.online { background: var(--success-color); }
+    .status-dot.busy { background: var(--warning-color); }
+    .status-dot.offline { background: var(--text-muted); }
+
+    .member-name {
+      font-weight: 500;
+      color: var(--text-primary);
+      display: block;
+    }
+
+    .member-role {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .tasks-progress {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      min-width: 100px;
+    }
+
+    .tasks-count {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    @media (max-width: 1200px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .content-grid {
         grid-template-columns: 1fr;
+      }
+
+      .orders-card,
+      .chart-card,
+      .products-card,
+      .team-card {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .order-row {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
       }
     }
   `]
 })
 export class DashboardComponent implements OnInit {
-  stats: DashboardStats | null = null;
-  recentOrderColumns = ['orderNumber', 'customerName', 'amount', 'status', 'date'];
-  maxRevenue = 0;
+  stats: StatCard[] = [
+    { title: 'Total Revenue', value: '$45,231', change: 12.5, changeLabel: 'from last month', icon: 'account_balance_wallet', gradient: 'primary' },
+    { title: 'Total Orders', value: '1,234', change: 8.2, changeLabel: 'from last month', icon: 'shopping_cart', gradient: 'success' },
+    { title: 'New Customers', value: '456', change: -2.4, changeLabel: 'from last month', icon: 'people', gradient: 'warning' },
+    { title: 'Conversion Rate', value: '3.24%', change: 4.1, changeLabel: 'from last month', icon: 'trending_up', gradient: 'info' }
+  ];
 
-  constructor(private apiService: ApiService) {}
+  recentOrders: RecentOrder[] = [
+    { id: '#ORD-7352', customer: 'Sarah Johnson', avatar: 'https://ui-avatars.com/api/?name=Sarah+Johnson&background=6366f1&color=fff', product: 'MacBook Pro 16"', amount: 2499, status: 'Delivered', date: new Date() },
+    { id: '#ORD-7351', customer: 'Michael Chen', avatar: 'https://ui-avatars.com/api/?name=Michael+Chen&background=10b981&color=fff', product: 'iPhone 15 Pro', amount: 1199, status: 'Processing', date: new Date(Date.now() - 86400000) },
+    { id: '#ORD-7350', customer: 'Emily Davis', avatar: 'https://ui-avatars.com/api/?name=Emily+Davis&background=f59e0b&color=fff', product: 'AirPods Pro', amount: 249, status: 'Shipped', date: new Date(Date.now() - 172800000) },
+    { id: '#ORD-7349', customer: 'James Wilson', avatar: 'https://ui-avatars.com/api/?name=James+Wilson&background=ef4444&color=fff', product: 'iPad Air', amount: 799, status: 'Pending', date: new Date(Date.now() - 259200000) },
+    { id: '#ORD-7348', customer: 'Lisa Anderson', avatar: 'https://ui-avatars.com/api/?name=Lisa+Anderson&background=8b5cf6&color=fff', product: 'Apple Watch', amount: 399, status: 'Delivered', date: new Date(Date.now() - 345600000) }
+  ];
 
-  ngOnInit(): void {
-    this.loadDashboardStats();
-  }
+  topProducts: TopProduct[] = [
+    { name: 'MacBook Pro 16"', category: 'Laptops', sales: 234, revenue: 584766, progress: 85, trend: 'up' },
+    { name: 'iPhone 15 Pro Max', category: 'Smartphones', sales: 189, revenue: 226611, progress: 72, trend: 'up' },
+    { name: 'iPad Pro 12.9"', category: 'Tablets', sales: 156, revenue: 171444, progress: 63, trend: 'down' },
+    { name: 'AirPods Pro', category: 'Audio', sales: 312, revenue: 77688, progress: 91, trend: 'up' }
+  ];
 
-  loadDashboardStats(): void {
-    this.apiService.get<DashboardStats>('dashboard/stats').subscribe({
-      next: (stats) => {
-        this.stats = stats;
-        if (stats?.salesByMonth) {
-          this.maxRevenue = Math.max(...stats.salesByMonth.map(s => s.revenue));
-        }
-      },
-      error: () => {
-        this.stats = this.getMockStats();
-        this.maxRevenue = Math.max(...this.stats.salesByMonth.map(s => s.revenue));
-      }
-    });
-  }
+  teamMembers: TeamMember[] = [
+    { name: 'Alex Thompson', role: 'Sales Manager', avatar: 'https://ui-avatars.com/api/?name=Alex+Thompson&background=6366f1&color=fff', tasks: 12, completedTasks: 10, status: 'online' },
+    { name: 'Maria Garcia', role: 'Marketing Lead', avatar: 'https://ui-avatars.com/api/?name=Maria+Garcia&background=10b981&color=fff', tasks: 8, completedTasks: 6, status: 'busy' },
+    { name: 'David Kim', role: 'Developer', avatar: 'https://ui-avatars.com/api/?name=David+Kim&background=f59e0b&color=fff', tasks: 15, completedTasks: 14, status: 'online' },
+    { name: 'Sophie Martin', role: 'Designer', avatar: 'https://ui-avatars.com/api/?name=Sophie+Martin&background=ec4899&color=fff', tasks: 10, completedTasks: 8, status: 'offline' }
+  ];
 
-  getStatusPercentage(count: number): number {
-    if (!this.stats?.orderStatusDistribution) return 0;
-    const total = this.stats.orderStatusDistribution.reduce((sum, s) => sum + s.count, 0);
-    return total > 0 ? (count / total) * 100 : 0;
-  }
+  chartData = [
+    { label: 'Jan', current: 65, previous: 45 },
+    { label: 'Feb', current: 75, previous: 55 },
+    { label: 'Mar', current: 55, previous: 65 },
+    { label: 'Apr', current: 85, previous: 50 },
+    { label: 'May', current: 70, previous: 60 },
+    { label: 'Jun', current: 90, previous: 70 }
+  ];
 
-  getSalesHeight(revenue: number): number {
-    return this.maxRevenue > 0 ? (revenue / this.maxRevenue) * 100 : 0;
-  }
+  ngOnInit(): void {}
 
-  private getMockStats(): DashboardStats {
-    return {
-      totalOrders: 1234,
-      pendingOrders: 56,
-      totalRevenue: 125000,
-      totalCustomers: 890,
-      lowStockItems: 12,
-      recentOrders: [
-        { id: 1, orderNumber: 'ORD-001', customerName: 'John Doe', amount: 250, status: 'Pending', date: new Date() },
-        { id: 2, orderNumber: 'ORD-002', customerName: 'Jane Smith', amount: 180, status: 'Processing', date: new Date() },
-        { id: 3, orderNumber: 'ORD-003', customerName: 'Bob Johnson', amount: 520, status: 'Shipped', date: new Date() },
-        { id: 4, orderNumber: 'ORD-004', customerName: 'Alice Brown', amount: 95, status: 'Delivered', date: new Date() },
-        { id: 5, orderNumber: 'ORD-005', customerName: 'Charlie Wilson', amount: 340, status: 'Pending', date: new Date() }
-      ],
-      salesByMonth: [
-        { month: 'Jan', revenue: 12000, orders: 120 },
-        { month: 'Feb', revenue: 15000, orders: 150 },
-        { month: 'Mar', revenue: 18000, orders: 180 },
-        { month: 'Apr', revenue: 14000, orders: 140 },
-        { month: 'May', revenue: 22000, orders: 220 },
-        { month: 'Jun', revenue: 19000, orders: 190 }
-      ],
-      topProducts: [
-        { productId: 1, productName: 'Product A', totalSold: 450, revenue: 22500 },
-        { productId: 2, productName: 'Product B', totalSold: 380, revenue: 19000 },
-        { productId: 3, productName: 'Product C', totalSold: 320, revenue: 16000 },
-        { productId: 4, productName: 'Product D', totalSold: 280, revenue: 14000 },
-        { productId: 5, productName: 'Product E', totalSold: 220, revenue: 11000 }
-      ],
-      orderStatusDistribution: [
-        { status: 'Pending', count: 45 },
-        { status: 'Processing', count: 32 },
-        { status: 'Shipped', count: 28 },
-        { status: 'Delivered', count: 156 },
-        { status: 'Cancelled', count: 8 }
-      ]
-    };
+  getSparkline(): string {
+    const points = [5, 15, 10, 20, 12, 25, 18, 28, 22, 30];
+    return points.map((y, i) => `${i === 0 ? 'M' : 'L'} ${i * 11} ${30 - y}`).join(' ');
   }
 }

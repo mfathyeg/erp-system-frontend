@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap, map } from 'rxjs';
+import { BehaviorSubject, Observable, tap, of, delay, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { User, LoginRequest, LoginResponse, RegisterRequest, UserRole } from '../models';
@@ -12,6 +12,52 @@ export class AuthService {
   private readonly TOKEN_KEY = 'erp_token';
   private readonly REFRESH_TOKEN_KEY = 'erp_refresh_token';
   private readonly USER_KEY = 'erp_user';
+
+  // Demo users for testing without backend
+  private readonly DEMO_USERS: { username: string; password: string; user: User }[] = [
+    {
+      username: 'admin',
+      password: 'admin123',
+      user: {
+        id: 1,
+        username: 'admin',
+        email: 'admin@duralux.com',
+        firstName: 'John',
+        lastName: 'Anderson',
+        role: UserRole.Admin,
+        isActive: true,
+        createdAt: new Date()
+      }
+    },
+    {
+      username: 'manager',
+      password: 'manager123',
+      user: {
+        id: 2,
+        username: 'manager',
+        email: 'manager@duralux.com',
+        firstName: 'Sarah',
+        lastName: 'Johnson',
+        role: UserRole.Manager,
+        isActive: true,
+        createdAt: new Date()
+      }
+    },
+    {
+      username: 'user',
+      password: 'user123',
+      user: {
+        id: 3,
+        username: 'user',
+        email: 'user@duralux.com',
+        firstName: 'Mike',
+        lastName: 'Wilson',
+        role: UserRole.Employee,
+        isActive: true,
+        createdAt: new Date()
+      }
+    }
+  ];
 
   private currentUserSubject = new BehaviorSubject<User | null>(this.getStoredUser());
   public currentUser$ = this.currentUserSubject.asObservable();
@@ -25,6 +71,33 @@ export class AuthService {
   ) {}
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
+    // Try demo login first
+    const demoUser = this.DEMO_USERS.find(
+      u => u.username === credentials.username && u.password === credentials.password
+    );
+
+    if (demoUser) {
+      // Simulate API delay
+      const mockResponse: LoginResponse = {
+        token: 'demo-jwt-token-' + Date.now(),
+        refreshToken: 'demo-refresh-token-' + Date.now(),
+        user: demoUser.user,
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+      };
+
+      return of(mockResponse).pipe(
+        delay(500), // Simulate network delay
+        tap(response => this.handleAuthResponse(response))
+      );
+    }
+
+    // If not a demo user, check if credentials were provided but wrong
+    const isAttemptingDemoLogin = this.DEMO_USERS.some(u => u.username === credentials.username);
+    if (isAttemptingDemoLogin) {
+      return throwError(() => new Error('Invalid password. Try: admin123, manager123, or user123'));
+    }
+
+    // Try real API (will fail if no backend)
     return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/login`, credentials)
       .pipe(
         tap(response => this.handleAuthResponse(response))
@@ -49,6 +122,23 @@ export class AuthService {
 
   refreshToken(): Observable<LoginResponse> {
     const refreshToken = this.getRefreshToken();
+
+    // For demo mode, just return a new token
+    if (refreshToken?.startsWith('demo-')) {
+      const currentUser = this.getCurrentUser();
+      if (currentUser) {
+        const mockResponse: LoginResponse = {
+          token: 'demo-jwt-token-' + Date.now(),
+          refreshToken: 'demo-refresh-token-' + Date.now(),
+          user: currentUser,
+          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+        };
+        return of(mockResponse).pipe(
+          tap(response => this.handleAuthResponse(response))
+        );
+      }
+    }
+
     return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/refresh`, { refreshToken })
       .pipe(
         tap(response => this.handleAuthResponse(response))
