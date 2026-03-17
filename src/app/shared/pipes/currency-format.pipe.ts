@@ -5,7 +5,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class CurrencyFormatPipe implements PipeTransform {
   transform(
-    value: number,
+    value: number | null | undefined,
     currencyCode: string = 'USD',
     locale: string = 'en-US'
   ): string {
