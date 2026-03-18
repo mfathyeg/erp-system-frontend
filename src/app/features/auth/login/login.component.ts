@@ -16,7 +16,7 @@ import { NotificationService } from '../../../core/services/notification.service
               <span>D</span>
             </div>
             <div class="logo-text">
-              <span class="brand">دورالوكس</span>
+              <span class="brand">ERP</span>
               <span class="tagline">نظام إدارة الموارد</span>
             </div>
           </div>
@@ -89,7 +89,7 @@ import { NotificationService } from '../../../core/services/notification.service
 
         <!-- Footer -->
         <p class="footer-text">
-          &copy; {{ currentYear }} نظام دورالوكس ERP. جميع الحقوق محفوظة.
+          &copy; {{ currentYear }} نظام ERP. جميع الحقوق محفوظة.
         </p>
       </div>
 
@@ -510,8 +510,10 @@ export class LoginComponent implements OnInit {
         this.notificationService.showSuccess('تم تسجيل الدخول بنجاح!');
         this.router.navigateByUrl(this.returnUrl);
       },
-      error: () => {
+      error: (error) => {
         this.isLoading = false;
+        const message = error?.error?.message || error?.message || 'فشل تسجيل الدخول. تحقق من بيانات الدخول.';
+        this.notificationService.showError(message);
       }
     });
   }

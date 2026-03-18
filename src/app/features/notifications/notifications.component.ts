@@ -448,8 +448,8 @@ export class NotificationsComponent implements OnInit, OnDestroy {
         this.totalItems = response.totalCount;
       },
       error: () => {
-        this.notifications = this.getMockNotifications();
-        this.totalItems = this.notifications.length;
+        this.notifications = [];
+        this.totalItems = 0;
       }
     });
 
@@ -540,14 +540,5 @@ export class NotificationsComponent implements OnInit, OnDestroy {
       Reconnecting: 'إعادة الاتصال'
     };
     return states[state] || state;
-  }
-
-  private getMockNotifications(): Notification[] {
-    return [
-      { id: 1, userId: 1, title: 'تم استلام طلب جديد', message: 'تم تقديم الطلب #ORD-2024-001 بواسطة أحمد محمد.', type: NotificationType.Order, isRead: false, createdAt: new Date() },
-      { id: 2, userId: 1, title: 'تنبيه مخزون منخفض', message: 'المنتج "شاشة 27 بوصة" على وشك النفاد. الكمية الحالية: 5', type: NotificationType.Inventory, isRead: false, createdAt: new Date(Date.now() - 3600000) },
-      { id: 3, userId: 1, title: 'تحديث النظام', message: 'سيخضع النظام للصيانة الليلة من الساعة 2 صباحاً حتى 4 صباحاً.', type: NotificationType.System, isRead: true, createdAt: new Date(Date.now() - 86400000) },
-      { id: 4, userId: 1, title: 'تم شحن الطلب', message: 'تم شحن الطلب #ORD-2024-002 إلى العميل.', type: NotificationType.Success, isRead: true, createdAt: new Date(Date.now() - 172800000) }
-    ];
   }
 }

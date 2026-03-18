@@ -293,7 +293,8 @@ export class OrderDetailsComponent implements OnInit {
         this.order = order;
       },
       error: () => {
-        this.order = this.getMockOrder(id);
+        this.notificationService.showError('فشل في تحميل تفاصيل الطلب');
+        this.router.navigate(['/orders']);
       }
     });
   }
@@ -321,25 +322,5 @@ export class OrderDetailsComponent implements OnInit {
   getTotalDiscount(): number {
     if (!this.order?.items) return 0;
     return this.order.items.reduce((sum, item) => sum + item.discount, 0);
-  }
-
-  private getMockOrder(id: number): Order {
-    return {
-      id,
-      orderNumber: `ORD-2024-00${id}`,
-      customerId: 1,
-      customerName: 'John Doe',
-      status: OrderStatus.Processing,
-      orderDate: new Date(),
-      totalAmount: 1250.00,
-      shippingAddress: { street: '123 Main St', city: 'New York', state: 'NY', postalCode: '10001', country: 'USA' },
-      billingAddress: { street: '123 Main St', city: 'New York', state: 'NY', postalCode: '10001', country: 'USA' },
-      items: [
-        { id: 1, orderId: id, productId: 1, productName: 'Laptop Dell XPS', sku: 'SKU-001', quantity: 1, unitPrice: 1299.99, discount: 100, totalPrice: 1199.99 },
-        { id: 2, orderId: id, productId: 2, productName: 'Wireless Mouse', sku: 'SKU-010', quantity: 2, unitPrice: 25.00, discount: 0, totalPrice: 50.00 }
-      ],
-      notes: 'Please deliver before 5 PM.',
-      createdAt: new Date()
-    };
   }
 }

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { Sort } from '@angular/material/sort';
 import { ApiService } from '../../core/services/api.service';
+import { NotificationService } from '../../core/services/notification.service';
 import { Transaction, TransactionType, TransactionStatus, FinancialSummary, PaginationParams } from '../../core/models';
 
 @Component({
@@ -524,7 +525,10 @@ export class FinanceComponent implements OnInit {
   transactionTypes = Object.values(TransactionType);
   transactionStatuses = Object.values(TransactionStatus);
 
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private apiService: ApiService,
+    private notificationService: NotificationService
+  ) {}
 
   ngOnInit(): void {
     this.loadSummary();
@@ -534,7 +538,10 @@ export class FinanceComponent implements OnInit {
   loadSummary(): void {
     this.apiService.get<FinancialSummary>('finance/summary').subscribe({
       next: (summary) => this.summary = summary,
-      error: () => this.summary = this.getMockSummary()
+      error: () => {
+        this.notificationService.showError('فشل في تحميل الملخص المالي');
+        this.summary = null;
+      }
     });
   }
 
@@ -553,8 +560,9 @@ export class FinanceComponent implements OnInit {
         this.totalItems = response.totalCount;
       },
       error: () => {
-        this.transactions = this.getMockTransactions();
-        this.totalItems = this.transactions.length;
+        this.notificationService.showError('فشل في تحميل المعاملات');
+        this.transactions = [];
+        this.totalItems = 0;
       }
     });
   }
@@ -630,25 +638,5 @@ export class FinanceComponent implements OnInit {
       Salaries: 'رواتب'
     };
     return categories[category] || category;
-  }
-
-  private getMockSummary(): FinancialSummary {
-    return {
-      totalIncome: 125000,
-      totalExpenses: 78000,
-      netProfit: 47000,
-      pendingPayments: 12500,
-      accountsReceivable: 35000,
-      accountsPayable: 22000
-    };
-  }
-
-  private getMockTransactions(): Transaction[] {
-    return [
-      { id: 1, transactionNumber: 'TXN-001', type: TransactionType.Income, category: 'Sales', amount: 5000, description: 'Product sales revenue', date: new Date(), status: TransactionStatus.Completed, createdBy: 1, createdAt: new Date() },
-      { id: 2, transactionNumber: 'TXN-002', type: TransactionType.Expense, category: 'Office Supplies', amount: 250, description: 'Office supplies purchase', date: new Date(), status: TransactionStatus.Completed, createdBy: 1, createdAt: new Date() },
-      { id: 3, transactionNumber: 'TXN-003', type: TransactionType.Income, category: 'Services', amount: 3500, description: 'Consulting services', date: new Date(), status: TransactionStatus.Pending, createdBy: 1, createdAt: new Date() },
-      { id: 4, transactionNumber: 'TXN-004', type: TransactionType.Expense, category: 'Utilities', amount: 850, description: 'Monthly utilities bill', date: new Date(), status: TransactionStatus.Completed, createdBy: 1, createdAt: new Date() }
-    ];
   }
 }

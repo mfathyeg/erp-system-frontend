@@ -714,7 +714,7 @@ export class ConfigurationComponent implements OnInit {
       next: (settings) => this.companyForm.patchValue(settings),
       error: () => {
         this.companyForm.patchValue({
-          companyName: 'شركة دورالوكس',
+          companyName: 'ERP',
           address: 'شارع الملك فهد، الرياض، المملكة العربية السعودية',
           phone: '+966 11 234 5678',
           email: 'info@duralux.sa',
@@ -731,7 +731,10 @@ export class ConfigurationComponent implements OnInit {
   loadSystemConfigs(): void {
     this.apiService.get<SystemConfiguration[]>('configuration/system').subscribe({
       next: (configs) => this.systemConfigs = configs,
-      error: () => this.systemConfigs = this.getMockConfigs()
+      error: () => {
+        this.notificationService.showError('فشل في تحميل إعدادات النظام');
+        this.systemConfigs = [];
+      }
     });
   }
 
@@ -808,15 +811,5 @@ export class ConfigurationComponent implements OnInit {
       TAX_RATE: 'نسبة الضريبة الافتراضية'
     };
     return descriptions[key] || key;
-  }
-
-  private getMockConfigs(): SystemConfiguration[] {
-    return [
-      { id: 1, key: 'MAX_LOGIN_ATTEMPTS', value: '5', category: ConfigCategory.Security, description: 'الحد الأقصى لمحاولات تسجيل الدخول قبل القفل', isEditable: true },
-      { id: 2, key: 'SESSION_TIMEOUT', value: '30', category: ConfigCategory.Security, description: 'مهلة انتهاء الجلسة بالدقائق', isEditable: true },
-      { id: 3, key: 'LOW_STOCK_THRESHOLD', value: '10', category: ConfigCategory.Inventory, description: 'حد التنبيه الافتراضي للمخزون المنخفض', isEditable: true },
-      { id: 4, key: 'ORDER_PREFIX', value: 'ORD', category: ConfigCategory.Orders, description: 'بادئة رقم الطلب', isEditable: true },
-      { id: 5, key: 'TAX_RATE', value: '15', category: ConfigCategory.Finance, description: 'نسبة ضريبة القيمة المضافة', isEditable: true }
-    ];
   }
 }

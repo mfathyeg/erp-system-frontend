@@ -554,8 +554,9 @@ export class InventoryListComponent implements OnInit {
         this.calculateStockCounts();
       },
       error: () => {
-        this.items = this.getMockItems();
-        this.totalItems = this.items.length;
+        this.notificationService.showError('فشل في تحميل المخزون');
+        this.items = [];
+        this.totalItems = 0;
         this.calculateStockCounts();
       }
     });
@@ -668,14 +669,5 @@ export class InventoryListComponent implements OnInit {
   getStockPercentage(item: InventoryItem): number {
     const maxStock = item.reorderLevel * 3;
     return Math.min((item.quantity / maxStock) * 100, 100);
-  }
-
-  private getMockItems(): InventoryItem[] {
-    return [
-      { id: 1, sku: 'SKU-001', name: 'لابتوب ديل XPS', description: 'لابتوب عالي الأداء', category: 'Electronics', quantity: 25, unitPrice: 1299.99, reorderLevel: 10, isActive: true, createdAt: new Date() },
-      { id: 2, sku: 'SKU-002', name: 'كرسي مكتب', description: 'كرسي مكتب مريح', category: 'Furniture', quantity: 5, unitPrice: 299.99, reorderLevel: 10, isActive: true, createdAt: new Date() },
-      { id: 3, sku: 'SKU-003', name: 'شاشة 27 بوصة', description: 'شاشة 4K', category: 'Electronics', quantity: 0, unitPrice: 499.99, reorderLevel: 5, isActive: true, createdAt: new Date() },
-      { id: 4, sku: 'SKU-004', name: 'لوحة مفاتيح', description: 'لوحة مفاتيح ميكانيكية', category: 'Electronics', quantity: 50, unitPrice: 149.99, reorderLevel: 15, isActive: true, createdAt: new Date() }
-    ];
   }
 }

@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { PageEvent } from '@angular/material/paginator';
 import { Sort } from '@angular/material/sort';
 import { ApiService } from '../../../core/services/api.service';
+import { NotificationService } from '../../../core/services/notification.service';
 import { Order, OrderStatus, PaginationParams } from '../../../core/models';
 
 @Component({
@@ -369,6 +370,7 @@ export class OrderListComponent implements OnInit {
 
   constructor(
     private apiService: ApiService,
+    private notificationService: NotificationService,
     private router: Router
   ) {}
 
@@ -391,8 +393,9 @@ export class OrderListComponent implements OnInit {
         this.totalItems = response.totalCount;
       },
       error: () => {
-        this.orders = this.getMockOrders();
-        this.totalItems = this.orders.length;
+        this.notificationService.showError('فشل في تحميل الطلبات');
+        this.orders = [];
+        this.totalItems = 0;
       }
     });
   }
@@ -444,14 +447,5 @@ export class OrderListComponent implements OnInit {
       Returned: 'مرتجع'
     };
     return statuses[status] || status;
-  }
-
-  private getMockOrders(): Order[] {
-    return [
-      { id: 1, orderNumber: 'ORD-2024-001', customerId: 1, customerName: 'أحمد محمد', status: OrderStatus.Pending, orderDate: new Date(), totalAmount: 1250.00, shippingAddress: { street: 'شارع الملك فهد', city: 'الرياض', state: 'الرياض', postalCode: '11564', country: 'السعودية' }, billingAddress: { street: 'شارع الملك فهد', city: 'الرياض', state: 'الرياض', postalCode: '11564', country: 'السعودية' }, items: [], createdAt: new Date() },
-      { id: 2, orderNumber: 'ORD-2024-002', customerId: 2, customerName: 'سارة علي', status: OrderStatus.Processing, orderDate: new Date(), totalAmount: 890.50, shippingAddress: { street: 'شارع التحلية', city: 'جدة', state: 'مكة', postalCode: '21442', country: 'السعودية' }, billingAddress: { street: 'شارع التحلية', city: 'جدة', state: 'مكة', postalCode: '21442', country: 'السعودية' }, items: [], createdAt: new Date() },
-      { id: 3, orderNumber: 'ORD-2024-003', customerId: 3, customerName: 'خالد عبدالله', status: OrderStatus.Shipped, orderDate: new Date(), totalAmount: 2100.00, shippingAddress: { street: 'شارع الأمير سلطان', city: 'الدمام', state: 'الشرقية', postalCode: '31411', country: 'السعودية' }, billingAddress: { street: 'شارع الأمير سلطان', city: 'الدمام', state: 'الشرقية', postalCode: '31411', country: 'السعودية' }, items: [], createdAt: new Date() },
-      { id: 4, orderNumber: 'ORD-2024-004', customerId: 4, customerName: 'نورة سعيد', status: OrderStatus.Delivered, orderDate: new Date(), totalAmount: 450.75, shippingAddress: { street: 'شارع العليا', city: 'الرياض', state: 'الرياض', postalCode: '11564', country: 'السعودية' }, billingAddress: { street: 'شارع العليا', city: 'الرياض', state: 'الرياض', postalCode: '11564', country: 'السعودية' }, items: [], createdAt: new Date() }
-    ];
   }
 }

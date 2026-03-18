@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap, of, delay, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { User, LoginRequest, LoginResponse, RegisterRequest, UserRole } from '../models';
@@ -12,53 +12,6 @@ export class AuthService {
   private readonly TOKEN_KEY = 'erp_token';
   private readonly REFRESH_TOKEN_KEY = 'erp_refresh_token';
   private readonly USER_KEY = 'erp_user';
-
-  // Demo users for testing without backend (fallback)
-  // When connected to backend, use: admin/Admin123!, manager/Manager123!, user/User123!
-  private readonly DEMO_USERS: { username: string; password: string; user: User }[] = [
-    {
-      username: 'admin',
-      password: 'Admin123!',
-      user: {
-        id: '00000000-0000-0000-0000-000000000001',
-        username: 'admin',
-        email: 'admin@duralux.sa',
-        firstName: 'أحمد',
-        lastName: 'محمد',
-        role: UserRole.Admin,
-        isActive: true,
-        createdAt: new Date()
-      }
-    },
-    {
-      username: 'manager',
-      password: 'Manager123!',
-      user: {
-        id: '00000000-0000-0000-0000-000000000002',
-        username: 'manager',
-        email: 'manager@duralux.sa',
-        firstName: 'سارة',
-        lastName: 'علي',
-        role: UserRole.Manager,
-        isActive: true,
-        createdAt: new Date()
-      }
-    },
-    {
-      username: 'user',
-      password: 'User123!',
-      user: {
-        id: '00000000-0000-0000-0000-000000000003',
-        username: 'user',
-        email: 'user@duralux.sa',
-        firstName: 'محمد',
-        lastName: 'خالد',
-        role: UserRole.Employee,
-        isActive: true,
-        createdAt: new Date()
-      }
-    }
-  ];
 
   private currentUserSubject = new BehaviorSubject<User | null>(this.getStoredUser());
   public currentUser$ = this.currentUserSubject.asObservable();
@@ -72,33 +25,6 @@ export class AuthService {
   ) {}
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
-    // Try demo login first
-    const demoUser = this.DEMO_USERS.find(
-      u => u.username === credentials.username && u.password === credentials.password
-    );
-
-    if (demoUser) {
-      // Simulate API delay
-      const mockResponse: LoginResponse = {
-        token: 'demo-jwt-token-' + Date.now(),
-        refreshToken: 'demo-refresh-token-' + Date.now(),
-        user: demoUser.user,
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
-      };
-
-      return of(mockResponse).pipe(
-        delay(500), // Simulate network delay
-        tap(response => this.handleAuthResponse(response))
-      );
-    }
-
-    // If not a demo user, check if credentials were provided but wrong
-    const isAttemptingDemoLogin = this.DEMO_USERS.some(u => u.username === credentials.username);
-    if (isAttemptingDemoLogin) {
-      return throwError(() => new Error('كلمة المرور غير صحيحة. جرب: Admin123!, Manager123!, أو User123!'));
-    }
-
-    // Try real API (will fail if no backend)
     return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/login`, credentials)
       .pipe(
         tap(response => this.handleAuthResponse(response))
@@ -113,6 +39,14 @@ export class AuthService {
   }
 
   logout(): void {
+    const token = this.getToken();
+    if (token) {
+      // Call backend logout endpoint
+      this.http.post(`${environment.apiUrl}/auth/logout`, {}).subscribe({
+        error: () => {} // Ignore errors on logout
+      });
+    }
+
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.REFRESH_TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);
@@ -123,23 +57,6 @@ export class AuthService {
 
   refreshToken(): Observable<LoginResponse> {
     const refreshToken = this.getRefreshToken();
-
-    // For demo mode, just return a new token
-    if (refreshToken?.startsWith('demo-')) {
-      const currentUser = this.getCurrentUser();
-      if (currentUser) {
-        const mockResponse: LoginResponse = {
-          token: 'demo-jwt-token-' + Date.now(),
-          refreshToken: 'demo-refresh-token-' + Date.now(),
-          user: currentUser,
-          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
-        };
-        return of(mockResponse).pipe(
-          tap(response => this.handleAuthResponse(response))
-        );
-      }
-    }
-
     return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/refresh`, { refreshToken })
       .pipe(
         tap(response => this.handleAuthResponse(response))

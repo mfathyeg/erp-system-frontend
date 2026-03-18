@@ -545,30 +545,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
       .subscribe(theme => this.isDarkMode = theme === 'dark');
 
     this.notificationService.getUnreadCount().subscribe();
-
-    // Set mock user for demo
-    if (!this.currentUser) {
-      this.currentUser = {
-        id: 1,
-        username: 'admin',
-        email: 'admin@duralux.com',
-        firstName: 'أحمد',
-        lastName: 'محمد',
-        role: 'مدير' as any,
-        isActive: true,
-        createdAt: new Date()
-      };
-    }
-
-    // Set mock notifications for demo
-    if (this.notifications.length === 0) {
-      this.notifications = [
-        { id: 1, userId: 1, title: 'تم استلام طلب جديد #ORD-2024-001', message: '', type: 'Order' as any, isRead: false, createdAt: new Date() },
-        { id: 2, userId: 1, title: 'تنبيه: مخزون منخفض - شاشة 27 بوصة', message: '', type: 'Warning' as any, isRead: false, createdAt: new Date(Date.now() - 3600000) },
-        { id: 3, userId: 1, title: 'تم استلام دفعة بقيمة 1,250.00 ر.س', message: '', type: 'Success' as any, isRead: true, createdAt: new Date(Date.now() - 7200000) }
-      ];
-      this.unreadCount = 2;
-    }
   }
 
   ngOnDestroy(): void {

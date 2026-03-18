@@ -414,9 +414,10 @@ export class UserListComponent implements OnInit {
         this.users = response.data;
         this.totalItems = response.totalCount;
       },
-      error: () => {
-        this.users = this.getMockUsers();
-        this.totalItems = this.users.length;
+      error: (error) => {
+        this.notificationService.showError('فشل في تحميل المستخدمين');
+        this.users = [];
+        this.totalItems = 0;
       }
     });
   }
@@ -518,14 +519,5 @@ export class UserListComponent implements OnInit {
       Viewer: 'مشاهد'
     };
     return roles[role] || role;
-  }
-
-  private getMockUsers(): User[] {
-    return [
-      { id: 1, username: 'admin', email: 'admin@erp.com', firstName: 'أحمد', lastName: 'محمد', role: 'Admin' as any, isActive: true, createdAt: new Date() },
-      { id: 2, username: 'manager1', email: 'manager@erp.com', firstName: 'سارة', lastName: 'علي', role: 'Manager' as any, isActive: true, createdAt: new Date() },
-      { id: 3, username: 'employee1', email: 'emp1@erp.com', firstName: 'خالد', lastName: 'عبدالله', role: 'Employee' as any, isActive: true, createdAt: new Date() },
-      { id: 4, username: 'viewer1', email: 'viewer@erp.com', firstName: 'نورة', lastName: 'سعيد', role: 'Viewer' as any, isActive: false, createdAt: new Date() }
-    ];
   }
 }

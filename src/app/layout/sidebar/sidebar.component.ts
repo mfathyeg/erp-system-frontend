@@ -30,7 +30,7 @@ interface NavGroup {
             <span>D</span>
           </div>
           <div class="logo-text">
-            <span class="brand">دورالوكس</span>
+            <span class="brand">ERP</span>
             <span class="tagline">نظام إدارة الموارد</span>
           </div>
         </div>
