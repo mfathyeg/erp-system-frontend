@@ -93,7 +93,7 @@ import { User, Notification } from '../../core/models';
         <!-- User Profile -->
         <div class="user-profile" [matMenuTriggerFor]="userMenu">
           <div class="user-avatar">
-            <img src="https://ui-avatars.com/api/?name={{ currentUser?.firstName }}+{{ currentUser?.lastName }}&background=6366f1&color=fff" alt="User">
+            <img src="https://ui-avatars.com/api/?name={{ currentUser?.firstName }}+{{ currentUser?.lastName }}&background=006C35&color=fff" alt="User">
             <span class="status-indicator online"></span>
           </div>
           <div class="user-info">
@@ -105,7 +105,7 @@ import { User, Notification } from '../../core/models';
         <mat-menu #userMenu="matMenu" class="user-menu">
           <div class="user-menu-header">
             <div class="user-avatar large">
-              <img src="https://ui-avatars.com/api/?name={{ currentUser?.firstName }}+{{ currentUser?.lastName }}&background=6366f1&color=fff&size=80" alt="User">
+              <img src="https://ui-avatars.com/api/?name={{ currentUser?.firstName }}+{{ currentUser?.lastName }}&background=006C35&color=fff&size=80" alt="User">
             </div>
             <div class="user-details">
               <h4>{{ currentUser?.firstName }} {{ currentUser?.lastName }}</h4>
@@ -139,7 +139,7 @@ import { User, Notification } from '../../core/models';
     .navbar {
       height: 70px;
       background: var(--navbar-bg);
-      border-bottom: 1px solid var(--border-color);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -162,9 +162,9 @@ import { User, Notification } from '../../core/models';
       width: 40px;
       height: 40px;
       border-radius: 10px;
-      border: 1px solid var(--border-color);
-      background: transparent;
-      color: var(--text-secondary);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -173,16 +173,16 @@ import { User, Notification } from '../../core/models';
     }
 
     .menu-toggle:hover {
-      background: var(--card-bg);
-      color: var(--text-primary);
-      border-color: var(--primary-color);
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border-color: rgba(255, 255, 255, 0.4);
     }
 
     .search-box {
       display: flex;
       align-items: center;
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 10px;
       padding: 0 16px;
       height: 44px;
@@ -191,12 +191,13 @@ import { User, Notification } from '../../core/models';
     }
 
     .search-box:focus-within {
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+      border-color: rgba(255, 255, 255, 0.4);
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.2);
     }
 
     .search-icon {
-      color: var(--text-muted);
+      color: rgba(255, 255, 255, 0.7);
       font-size: 20px;
       margin-left: 12px;
       margin-right: 0;
@@ -207,20 +208,20 @@ import { User, Notification } from '../../core/models';
       background: transparent;
       border: none;
       outline: none;
-      color: var(--text-primary);
+      color: white;
       font-size: 14px;
     }
 
     .search-input::placeholder {
-      color: var(--text-muted);
+      color: rgba(255, 255, 255, 0.6);
     }
 
     .search-shortcut {
       padding: 4px 8px;
-      background: var(--secondary-bg);
+      background: rgba(255, 255, 255, 0.15);
       border-radius: 6px;
       font-size: 11px;
-      color: var(--text-muted);
+      color: rgba(255, 255, 255, 0.7);
       font-weight: 500;
     }
 
@@ -235,9 +236,9 @@ import { User, Notification } from '../../core/models';
       height: 40px;
       padding: 0 12px;
       border-radius: 10px;
-      border: 1px solid var(--border-color);
-      background: transparent;
-      color: var(--text-secondary);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -246,8 +247,8 @@ import { User, Notification } from '../../core/models';
     }
 
     .nav-btn:hover {
-      background: var(--card-bg);
-      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
     }
 
     .nav-btn.icon-btn {
@@ -262,8 +263,8 @@ import { User, Notification } from '../../core/models';
     }
 
     .nav-btn.theme-toggle:hover {
-      border-color: var(--warning-color);
-      background: rgba(245, 158, 11, 0.1);
+      border-color: #fbbf24;
+      background: rgba(251, 191, 36, 0.2);
     }
 
     .theme-icon {
@@ -272,7 +273,7 @@ import { User, Notification } from '../../core/models';
 
     .nav-btn.theme-toggle:hover .theme-icon {
       transform: rotate(30deg);
-      color: var(--warning-color);
+      color: #fbbf24;
     }
 
     .flag-icon {
@@ -284,13 +285,14 @@ import { User, Notification } from '../../core/models';
     .lang-text {
       font-size: 13px;
       font-weight: 500;
+      color: white;
     }
 
     .dropdown-icon {
       font-size: 18px;
       width: 18px;
       height: 18px;
-      color: var(--text-muted);
+      color: rgba(255, 255, 255, 0.7);
     }
 
     /* User Profile */
@@ -307,7 +309,7 @@ import { User, Notification } from '../../core/models';
     }
 
     .user-profile:hover {
-      background: var(--card-bg);
+      background: rgba(255, 255, 255, 0.1);
     }
 
     .user-avatar {
@@ -316,6 +318,7 @@ import { User, Notification } from '../../core/models';
       border-radius: 10px;
       overflow: hidden;
       position: relative;
+      border: 2px solid rgba(255, 255, 255, 0.3);
     }
 
     .user-avatar img {
@@ -342,7 +345,7 @@ import { User, Notification } from '../../core/models';
     }
 
     .status-indicator.online {
-      background: var(--success-color);
+      background: #4ade80;
     }
 
     .user-info {
@@ -353,12 +356,12 @@ import { User, Notification } from '../../core/models';
     .user-name {
       font-size: 14px;
       font-weight: 600;
-      color: var(--text-primary);
+      color: white;
     }
 
     .user-role {
       font-size: 12px;
-      color: var(--text-muted);
+      color: rgba(255, 255, 255, 0.7);
     }
 
     /* Notification Menu */

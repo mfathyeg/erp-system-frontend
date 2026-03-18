@@ -113,7 +113,7 @@ interface NavGroup {
       display: flex;
       flex-direction: column;
       transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      border-left: 1px solid var(--border-color);
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
       border-right: none;
     }
 
@@ -124,7 +124,7 @@ interface NavGroup {
     /* Logo Section */
     .logo-section {
       padding: 20px;
-      border-bottom: 1px solid var(--border-color);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .logo {
@@ -136,7 +136,7 @@ interface NavGroup {
     .logo-icon {
       width: 42px;
       height: 42px;
-      background: var(--gradient-primary);
+      background: rgba(255, 255, 255, 0.2);
       border-radius: 12px;
       display: flex;
       align-items: center;
@@ -144,7 +144,7 @@ interface NavGroup {
       font-size: 20px;
       font-weight: 700;
       color: white;
-      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
     .logo-icon.small {
@@ -166,13 +166,13 @@ interface NavGroup {
     .brand {
       font-size: 18px;
       font-weight: 700;
-      color: var(--text-primary);
+      color: white;
       letter-spacing: -0.5px;
     }
 
     .tagline {
       font-size: 11px;
-      color: var(--text-muted);
+      color: rgba(255, 255, 255, 0.7);
       text-transform: uppercase;
       letter-spacing: 1px;
     }
@@ -192,7 +192,7 @@ interface NavGroup {
     .nav-group-title {
       font-size: 11px;
       font-weight: 600;
-      color: var(--text-muted);
+      color: rgba(255, 255, 255, 0.5);
       text-transform: uppercase;
       letter-spacing: 1.2px;
       padding: 0 12px;
@@ -205,7 +205,7 @@ interface NavGroup {
       padding: 12px;
       margin: 4px 0;
       border-radius: 10px;
-      color: var(--text-secondary);
+      color: rgba(255, 255, 255, 0.8);
       cursor: pointer;
       transition: all 0.2s ease;
       text-decoration: none;
@@ -213,14 +213,14 @@ interface NavGroup {
     }
 
     .nav-item:hover {
-      background: var(--card-bg-hover);
-      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
     }
 
     .nav-item.active {
-      background: var(--gradient-primary);
+      background: rgba(255, 255, 255, 0.2);
       color: white;
-      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
     .nav-item.active .nav-icon mat-icon {
@@ -234,7 +234,7 @@ interface NavGroup {
       align-items: center;
       justify-content: center;
       border-radius: 8px;
-      background: var(--secondary-bg);
+      background: rgba(255, 255, 255, 0.1);
       margin-left: 12px;
       margin-right: 0;
       flex-shrink: 0;
@@ -248,12 +248,12 @@ interface NavGroup {
       font-size: 20px;
       width: 20px;
       height: 20px;
-      color: var(--text-secondary);
+      color: rgba(255, 255, 255, 0.8);
       transition: color 0.2s ease;
     }
 
     .nav-item:hover .nav-icon mat-icon {
-      color: var(--primary-light);
+      color: white;
     }
 
     .nav-label {
@@ -294,7 +294,7 @@ interface NavGroup {
       align-items: center;
       gap: 12px;
       padding: 10px 12px;
-      color: var(--text-muted);
+      color: rgba(255, 255, 255, 0.6);
       font-size: 13px;
       cursor: pointer;
       transition: all 0.2s ease;
@@ -303,32 +303,32 @@ interface NavGroup {
     }
 
     .nav-child:hover {
-      color: var(--text-primary);
-      background: var(--card-bg-hover);
+      color: white;
+      background: rgba(255, 255, 255, 0.1);
     }
 
     .nav-child.active {
-      color: var(--primary-light);
+      color: white;
     }
 
     .child-dot {
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: var(--text-muted);
+      background: rgba(255, 255, 255, 0.5);
       transition: all 0.2s ease;
     }
 
     .nav-child:hover .child-dot,
     .nav-child.active .child-dot {
-      background: var(--primary-color);
-      box-shadow: 0 0 8px var(--primary-color);
+      background: white;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
     }
 
     /* Sidebar Footer */
     .sidebar-footer {
       padding: 16px;
-      border-top: 1px solid var(--border-color);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
       display: flex;
       justify-content: center;
     }
@@ -337,9 +337,9 @@ interface NavGroup {
       width: 36px;
       height: 36px;
       border-radius: 8px;
-      border: 1px solid var(--border-color);
-      background: transparent;
-      color: var(--text-secondary);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -348,9 +348,9 @@ interface NavGroup {
     }
 
     .collapse-btn:hover {
-      background: var(--card-bg-hover);
-      color: var(--text-primary);
-      border-color: var(--primary-color);
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border-color: rgba(255, 255, 255, 0.4);
     }
 
     /* Collapsed State */
@@ -378,7 +378,7 @@ interface NavGroup {
     }
 
     .nav-container::-webkit-scrollbar-thumb {
-      background: var(--border-color);
+      background: rgba(255, 255, 255, 0.3);
       border-radius: 2px;
     }
 
