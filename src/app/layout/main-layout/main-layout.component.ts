@@ -25,7 +25,7 @@ import { SignalRService } from '../../core/services/signalr.service';
             </app-sidebar>
           </mat-sidenav>
 
-          <mat-sidenav-content class="main-content" [style.margin-left]="getContentMargin()">
+          <mat-sidenav-content class="main-content" [style.margin-right]="getContentMargin()">
             <!-- Loading Bar -->
             <div class="loading-bar" *ngIf="isLoading">
               <div class="loading-progress"></div>
@@ -63,7 +63,7 @@ import { SignalRService } from '../../core/services/signalr.service';
     .main-content {
       background: var(--primary-bg);
       min-height: calc(100vh - 70px);
-      transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .page-wrapper {

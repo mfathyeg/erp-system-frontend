@@ -9,24 +9,24 @@ import { CompanySettings, SystemConfiguration, ConfigCategory } from '../../core
   template: `
     <div class="configuration-container">
       <app-page-header
-        title="Configuration"
-        subtitle="Manage system settings and preferences"
-        [breadcrumb]="['Dashboard', 'Configuration']">
+        title="الإعدادات"
+        subtitle="إدارة إعدادات النظام والتفضيلات"
+        [breadcrumb]="['لوحة التحكم', 'الإعدادات']">
       </app-page-header>
 
       <div class="tabs-container">
         <div class="tab-list">
           <button class="tab-btn" [class.active]="activeTab === 'company'" (click)="activeTab = 'company'">
             <mat-icon>business</mat-icon>
-            Company Settings
+            إعدادات الشركة
           </button>
           <button class="tab-btn" [class.active]="activeTab === 'system'" (click)="activeTab = 'system'">
             <mat-icon>settings</mat-icon>
-            System Settings
+            إعدادات النظام
           </button>
           <button class="tab-btn" [class.active]="activeTab === 'notifications'" (click)="activeTab = 'notifications'">
             <mat-icon>notifications</mat-icon>
-            Notifications
+            الإشعارات
           </button>
         </div>
 
@@ -38,94 +38,94 @@ import { CompanySettings, SystemConfiguration, ConfigCategory } from '../../core
                 <mat-icon>business</mat-icon>
               </div>
               <div class="header-text">
-                <h3>Company Information</h3>
-                <p>Basic information about your company</p>
+                <h3>معلومات الشركة</h3>
+                <p>المعلومات الأساسية عن شركتك</p>
               </div>
             </div>
 
             <form [formGroup]="companyForm" (ngSubmit)="saveCompanySettings()">
               <div class="form-grid">
                 <div class="form-group">
-                  <label>Company Name</label>
+                  <label>اسم الشركة</label>
                   <div class="input-wrapper">
                     <mat-icon>business</mat-icon>
-                    <input type="text" formControlName="companyName" placeholder="Enter company name">
+                    <input type="text" formControlName="companyName" placeholder="أدخل اسم الشركة">
                   </div>
                 </div>
 
                 <div class="form-group">
-                  <label>Tax ID</label>
+                  <label>الرقم الضريبي</label>
                   <div class="input-wrapper">
                     <mat-icon>receipt</mat-icon>
-                    <input type="text" formControlName="taxId" placeholder="Enter tax ID">
+                    <input type="text" formControlName="taxId" placeholder="أدخل الرقم الضريبي">
                   </div>
                 </div>
               </div>
 
               <div class="form-group full-width">
-                <label>Address</label>
+                <label>العنوان</label>
                 <div class="input-wrapper textarea-wrapper">
                   <mat-icon>location_on</mat-icon>
-                  <textarea formControlName="address" rows="2" placeholder="Enter company address"></textarea>
+                  <textarea formControlName="address" rows="2" placeholder="أدخل عنوان الشركة"></textarea>
                 </div>
               </div>
 
               <div class="form-grid">
                 <div class="form-group">
-                  <label>Phone</label>
+                  <label>الهاتف</label>
                   <div class="input-wrapper">
                     <mat-icon>phone</mat-icon>
-                    <input type="text" formControlName="phone" placeholder="Enter phone number">
+                    <input type="text" formControlName="phone" placeholder="أدخل رقم الهاتف">
                   </div>
                 </div>
 
                 <div class="form-group">
-                  <label>Email</label>
+                  <label>البريد الإلكتروني</label>
                   <div class="input-wrapper">
                     <mat-icon>email</mat-icon>
-                    <input type="email" formControlName="email" placeholder="Enter email address">
+                    <input type="email" formControlName="email" placeholder="أدخل البريد الإلكتروني">
                   </div>
                 </div>
               </div>
 
               <div class="form-grid">
                 <div class="form-group">
-                  <label>Website</label>
+                  <label>الموقع الإلكتروني</label>
                   <div class="input-wrapper">
                     <mat-icon>language</mat-icon>
-                    <input type="text" formControlName="website" placeholder="Enter website URL">
+                    <input type="text" formControlName="website" placeholder="أدخل رابط الموقع">
                   </div>
                 </div>
 
                 <div class="form-group">
-                  <label>Currency</label>
+                  <label>العملة</label>
                   <select formControlName="currency">
-                    <option value="USD">USD - US Dollar</option>
-                    <option value="EUR">EUR - Euro</option>
-                    <option value="GBP">GBP - British Pound</option>
-                    <option value="JPY">JPY - Japanese Yen</option>
+                    <option value="SAR">ر.س - ريال سعودي</option>
+                    <option value="AED">د.إ - درهم إماراتي</option>
+                    <option value="USD">$ - دولار أمريكي</option>
+                    <option value="EUR">€ - يورو</option>
                   </select>
                 </div>
               </div>
 
               <div class="form-grid">
                 <div class="form-group">
-                  <label>Timezone</label>
+                  <label>المنطقة الزمنية</label>
                   <select formControlName="timezone">
-                    <option value="America/New_York">Eastern Time (ET)</option>
-                    <option value="America/Chicago">Central Time (CT)</option>
-                    <option value="America/Denver">Mountain Time (MT)</option>
-                    <option value="America/Los_Angeles">Pacific Time (PT)</option>
-                    <option value="UTC">UTC</option>
+                    <option value="Asia/Riyadh">توقيت الرياض (GMT+3)</option>
+                    <option value="Asia/Dubai">توقيت دبي (GMT+4)</option>
+                    <option value="Africa/Cairo">توقيت القاهرة (GMT+2)</option>
+                    <option value="Asia/Kuwait">توقيت الكويت (GMT+3)</option>
+                    <option value="UTC">التوقيت العالمي (UTC)</option>
                   </select>
                 </div>
 
                 <div class="form-group">
-                  <label>Date Format</label>
+                  <label>صيغة التاريخ</label>
                   <select formControlName="dateFormat">
-                    <option value="MM/DD/YYYY">MM/DD/YYYY</option>
                     <option value="DD/MM/YYYY">DD/MM/YYYY</option>
                     <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                    <option value="MM/DD/YYYY">MM/DD/YYYY</option>
                   </select>
                 </div>
               </div>
@@ -134,7 +134,7 @@ import { CompanySettings, SystemConfiguration, ConfigCategory } from '../../core
                 <button type="submit" class="btn-save" [disabled]="companyForm.invalid || isSaving">
                   <div class="spinner" *ngIf="isSaving"></div>
                   <mat-icon *ngIf="!isSaving">save</mat-icon>
-                  <span>{{ isSaving ? 'Saving...' : 'Save Changes' }}</span>
+                  <span>{{ isSaving ? 'جاري الحفظ...' : 'حفظ التغييرات' }}</span>
                 </button>
               </div>
             </form>
@@ -149,8 +149,8 @@ import { CompanySettings, SystemConfiguration, ConfigCategory } from '../../core
                 <mat-icon>{{ getCategoryIcon(category) }}</mat-icon>
               </div>
               <div class="header-text">
-                <h3>{{ category }}</h3>
-                <p>Configure {{ category.toLowerCase() }} settings</p>
+                <h3>{{ getCategoryArabic(category) }}</h3>
+                <p>إعدادات {{ getCategoryArabic(category) }}</p>
               </div>
             </div>
 
@@ -158,7 +158,7 @@ import { CompanySettings, SystemConfiguration, ConfigCategory } from '../../core
               <div class="setting-item" *ngFor="let config of getConfigsByCategory(category)">
                 <div class="setting-info">
                   <span class="setting-key">{{ config.key }}</span>
-                  <span class="setting-description">{{ config.description }}</span>
+                  <span class="setting-description">{{ getConfigDescriptionArabic(config.key) }}</span>
                 </div>
                 <div class="setting-value">
                   <div class="input-wrapper small" *ngIf="config.isEditable">
@@ -179,8 +179,8 @@ import { CompanySettings, SystemConfiguration, ConfigCategory } from '../../core
                 <mat-icon>notifications</mat-icon>
               </div>
               <div class="header-text">
-                <h3>Notification Preferences</h3>
-                <p>Control how and when you receive notifications</p>
+                <h3>تفضيلات الإشعارات</h3>
+                <p>التحكم في كيفية ووقت استلام الإشعارات</p>
               </div>
             </div>
 
@@ -191,8 +191,8 @@ import { CompanySettings, SystemConfiguration, ConfigCategory } from '../../core
                     <mat-icon>email</mat-icon>
                   </div>
                   <div class="toggle-text">
-                    <span class="toggle-label">Email Notifications</span>
-                    <span class="toggle-description">Receive notifications via email</span>
+                    <span class="toggle-label">إشعارات البريد الإلكتروني</span>
+                    <span class="toggle-description">استلام الإشعارات عبر البريد الإلكتروني</span>
                   </div>
                 </div>
                 <label class="switch">
@@ -207,8 +207,8 @@ import { CompanySettings, SystemConfiguration, ConfigCategory } from '../../core
                     <mat-icon>notifications_active</mat-icon>
                   </div>
                   <div class="toggle-text">
-                    <span class="toggle-label">Push Notifications</span>
-                    <span class="toggle-description">Receive browser push notifications</span>
+                    <span class="toggle-label">إشعارات الدفع</span>
+                    <span class="toggle-description">استلام إشعارات المتصفح الفورية</span>
                   </div>
                 </div>
                 <label class="switch">
@@ -223,8 +223,8 @@ import { CompanySettings, SystemConfiguration, ConfigCategory } from '../../core
                     <mat-icon>shopping_cart</mat-icon>
                   </div>
                   <div class="toggle-text">
-                    <span class="toggle-label">Order Updates</span>
-                    <span class="toggle-description">Get notified about order status changes</span>
+                    <span class="toggle-label">تحديثات الطلبات</span>
+                    <span class="toggle-description">الإشعار بتغييرات حالة الطلبات</span>
                   </div>
                 </div>
                 <label class="switch">
@@ -239,8 +239,8 @@ import { CompanySettings, SystemConfiguration, ConfigCategory } from '../../core
                     <mat-icon>inventory_2</mat-icon>
                   </div>
                   <div class="toggle-text">
-                    <span class="toggle-label">Inventory Alerts</span>
-                    <span class="toggle-description">Get notified about low stock items</span>
+                    <span class="toggle-label">تنبيهات المخزون</span>
+                    <span class="toggle-description">الإشعار عند انخفاض المخزون</span>
                   </div>
                 </div>
                 <label class="switch">
@@ -255,8 +255,8 @@ import { CompanySettings, SystemConfiguration, ConfigCategory } from '../../core
                     <mat-icon>settings_suggest</mat-icon>
                   </div>
                   <div class="toggle-text">
-                    <span class="toggle-label">System Alerts</span>
-                    <span class="toggle-description">Get notified about system updates and maintenance</span>
+                    <span class="toggle-label">تنبيهات النظام</span>
+                    <span class="toggle-description">الإشعار بتحديثات وصيانة النظام</span>
                   </div>
                 </div>
                 <label class="switch">
@@ -642,7 +642,7 @@ import { CompanySettings, SystemConfiguration, ConfigCategory } from '../../core
       content: "";
       height: 20px;
       width: 20px;
-      left: 3px;
+      right: 3px;
       bottom: 3px;
       background: white;
       border-radius: 50%;
@@ -654,7 +654,7 @@ import { CompanySettings, SystemConfiguration, ConfigCategory } from '../../core
     }
 
     .switch input:checked + .slider::before {
-      transform: translateX(22px);
+      transform: translateX(-22px);
     }
 
     @media (max-width: 768px) {
@@ -703,9 +703,9 @@ export class ConfigurationComponent implements OnInit {
       email: ['', Validators.email],
       website: [''],
       taxId: [''],
-      currency: ['USD'],
-      timezone: ['America/New_York'],
-      dateFormat: ['MM/DD/YYYY']
+      currency: ['SAR'],
+      timezone: ['Asia/Riyadh'],
+      dateFormat: ['DD/MM/YYYY']
     });
   }
 
@@ -714,15 +714,15 @@ export class ConfigurationComponent implements OnInit {
       next: (settings) => this.companyForm.patchValue(settings),
       error: () => {
         this.companyForm.patchValue({
-          companyName: 'Duralux Inc.',
-          address: '123 Business Ave, Suite 100',
-          phone: '+1 (555) 123-4567',
-          email: 'info@duralux.com',
-          website: 'https://duralux.com',
-          taxId: '12-3456789',
-          currency: 'USD',
-          timezone: 'America/New_York',
-          dateFormat: 'MM/DD/YYYY'
+          companyName: 'شركة دورالوكس',
+          address: 'شارع الملك فهد، الرياض، المملكة العربية السعودية',
+          phone: '+966 11 234 5678',
+          email: 'info@duralux.sa',
+          website: 'https://duralux.sa',
+          taxId: '300123456789003',
+          currency: 'SAR',
+          timezone: 'Asia/Riyadh',
+          dateFormat: 'DD/MM/YYYY'
         });
       }
     });
@@ -741,7 +741,7 @@ export class ConfigurationComponent implements OnInit {
     this.isSaving = true;
     this.apiService.put('configuration/company', this.companyForm.value).subscribe({
       next: () => {
-        this.notificationService.showSuccess('Company settings saved successfully');
+        this.notificationService.showSuccess('تم حفظ إعدادات الشركة بنجاح');
         this.isSaving = false;
       },
       error: () => {
@@ -752,13 +752,13 @@ export class ConfigurationComponent implements OnInit {
 
   updateConfig(config: SystemConfiguration): void {
     this.apiService.put(`configuration/system/${config.id}`, { value: config.value }).subscribe({
-      next: () => this.notificationService.showSuccess('Setting updated')
+      next: () => this.notificationService.showSuccess('تم تحديث الإعداد')
     });
   }
 
   saveNotificationPrefs(): void {
     this.apiService.put('configuration/notifications', this.notificationPrefs).subscribe({
-      next: () => this.notificationService.showSuccess('Notification preferences saved')
+      next: () => this.notificationService.showSuccess('تم حفظ تفضيلات الإشعارات')
     });
   }
 
@@ -788,13 +788,35 @@ export class ConfigurationComponent implements OnInit {
     return colors[category] || '';
   }
 
+  getCategoryArabic(category: string): string {
+    const categories: { [key: string]: string } = {
+      Security: 'الأمان',
+      Inventory: 'المخزون',
+      Orders: 'الطلبات',
+      Finance: 'المالية',
+      General: 'عام'
+    };
+    return categories[category] || category;
+  }
+
+  getConfigDescriptionArabic(key: string): string {
+    const descriptions: { [key: string]: string } = {
+      MAX_LOGIN_ATTEMPTS: 'الحد الأقصى لمحاولات تسجيل الدخول قبل القفل',
+      SESSION_TIMEOUT: 'مهلة انتهاء الجلسة بالدقائق',
+      LOW_STOCK_THRESHOLD: 'حد التنبيه الافتراضي للمخزون المنخفض',
+      ORDER_PREFIX: 'بادئة رقم الطلب',
+      TAX_RATE: 'نسبة الضريبة الافتراضية'
+    };
+    return descriptions[key] || key;
+  }
+
   private getMockConfigs(): SystemConfiguration[] {
     return [
-      { id: 1, key: 'MAX_LOGIN_ATTEMPTS', value: '5', category: ConfigCategory.Security, description: 'Maximum login attempts before lockout', isEditable: true },
-      { id: 2, key: 'SESSION_TIMEOUT', value: '30', category: ConfigCategory.Security, description: 'Session timeout in minutes', isEditable: true },
-      { id: 3, key: 'LOW_STOCK_THRESHOLD', value: '10', category: ConfigCategory.Inventory, description: 'Default low stock alert threshold', isEditable: true },
-      { id: 4, key: 'ORDER_PREFIX', value: 'ORD', category: ConfigCategory.Orders, description: 'Order number prefix', isEditable: true },
-      { id: 5, key: 'TAX_RATE', value: '8.5', category: ConfigCategory.Finance, description: 'Default tax rate percentage', isEditable: true }
+      { id: 1, key: 'MAX_LOGIN_ATTEMPTS', value: '5', category: ConfigCategory.Security, description: 'الحد الأقصى لمحاولات تسجيل الدخول قبل القفل', isEditable: true },
+      { id: 2, key: 'SESSION_TIMEOUT', value: '30', category: ConfigCategory.Security, description: 'مهلة انتهاء الجلسة بالدقائق', isEditable: true },
+      { id: 3, key: 'LOW_STOCK_THRESHOLD', value: '10', category: ConfigCategory.Inventory, description: 'حد التنبيه الافتراضي للمخزون المنخفض', isEditable: true },
+      { id: 4, key: 'ORDER_PREFIX', value: 'ORD', category: ConfigCategory.Orders, description: 'بادئة رقم الطلب', isEditable: true },
+      { id: 5, key: 'TAX_RATE', value: '15', category: ConfigCategory.Finance, description: 'نسبة ضريبة القيمة المضافة', isEditable: true }
     ];
   }
 }

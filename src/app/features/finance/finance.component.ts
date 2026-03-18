@@ -9,9 +9,9 @@ import { Transaction, TransactionType, TransactionStatus, FinancialSummary, Pagi
   template: `
     <div class="finance-container">
       <app-page-header
-        title="Finance"
-        subtitle="Financial overview and transactions"
-        [breadcrumb]="['Dashboard', 'Finance']">
+        title="المالية"
+        subtitle="نظرة عامة مالية والمعاملات"
+        [breadcrumb]="['لوحة التحكم', 'المالية']">
       </app-page-header>
 
       <!-- Summary Cards -->
@@ -22,7 +22,7 @@ import { Transaction, TransactionType, TransactionStatus, FinancialSummary, Pagi
           </div>
           <div class="card-info">
             <span class="card-amount">{{ summary?.totalIncome | currencyFormat }}</span>
-            <span class="card-label">Total Income</span>
+            <span class="card-label">إجمالي الدخل</span>
             <span class="card-trend positive">
               <mat-icon>arrow_upward</mat-icon>
               +12.5%
@@ -36,7 +36,7 @@ import { Transaction, TransactionType, TransactionStatus, FinancialSummary, Pagi
           </div>
           <div class="card-info">
             <span class="card-amount">{{ summary?.totalExpenses | currencyFormat }}</span>
-            <span class="card-label">Total Expenses</span>
+            <span class="card-label">إجمالي المصروفات</span>
             <span class="card-trend negative">
               <mat-icon>arrow_upward</mat-icon>
               +8.2%
@@ -50,7 +50,7 @@ import { Transaction, TransactionType, TransactionStatus, FinancialSummary, Pagi
           </div>
           <div class="card-info">
             <span class="card-amount">{{ summary?.netProfit | currencyFormat }}</span>
-            <span class="card-label">Net Profit</span>
+            <span class="card-label">صافي الربح</span>
             <span class="card-trend positive">
               <mat-icon>arrow_upward</mat-icon>
               +18.3%
@@ -64,10 +64,10 @@ import { Transaction, TransactionType, TransactionStatus, FinancialSummary, Pagi
           </div>
           <div class="card-info">
             <span class="card-amount">{{ summary?.pendingPayments | currencyFormat }}</span>
-            <span class="card-label">Pending Payments</span>
+            <span class="card-label">مدفوعات معلقة</span>
             <span class="card-trend neutral">
               <mat-icon>remove</mat-icon>
-              3 invoices
+              3 فواتير
             </span>
           </div>
         </div>
@@ -76,28 +76,28 @@ import { Transaction, TransactionType, TransactionStatus, FinancialSummary, Pagi
       <!-- Transactions Table -->
       <div class="content-card">
         <div class="card-header">
-          <h3>Recent Transactions</h3>
+          <h3>المعاملات الأخيرة</h3>
           <button class="btn-export">
             <mat-icon>download</mat-icon>
-            Export
+            تصدير
           </button>
         </div>
 
         <div class="card-toolbar">
           <div class="search-box">
             <mat-icon>search</mat-icon>
-            <input type="text" (keyup)="onSearch($event)" placeholder="Search transactions...">
+            <input type="text" (keyup)="onSearch($event)" placeholder="البحث عن المعاملات...">
           </div>
 
           <div class="filters">
             <select (change)="onTypeFilter($any($event.target).value)">
-              <option value="">All Types</option>
-              <option *ngFor="let type of transactionTypes" [value]="type">{{ type }}</option>
+              <option value="">جميع الأنواع</option>
+              <option *ngFor="let type of transactionTypes" [value]="type">{{ getTypeArabic(type) }}</option>
             </select>
 
             <select (change)="onStatusFilter($any($event.target).value)">
-              <option value="">All Statuses</option>
-              <option *ngFor="let status of transactionStatuses" [value]="status">{{ status }}</option>
+              <option value="">جميع الحالات</option>
+              <option *ngFor="let status of transactionStatuses" [value]="status">{{ getStatusArabic(status) }}</option>
             </select>
           </div>
         </div>
@@ -105,50 +105,50 @@ import { Transaction, TransactionType, TransactionStatus, FinancialSummary, Pagi
         <div class="table-container">
           <table mat-table [dataSource]="transactions" matSort (matSortChange)="onSortChange($event)">
             <ng-container matColumnDef="transactionNumber">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Transaction #</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>رقم المعاملة</th>
               <td mat-cell *matCellDef="let t">
                 <span class="txn-number">{{ t.transactionNumber }}</span>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="date">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>التاريخ</th>
               <td mat-cell *matCellDef="let t">{{ t.date | date:'mediumDate' }}</td>
             </ng-container>
 
             <ng-container matColumnDef="type">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>النوع</th>
               <td mat-cell *matCellDef="let t">
                 <span class="type-badge" [ngClass]="'type-' + t.type.toLowerCase()">
                   <mat-icon>{{ getTypeIcon(t.type) }}</mat-icon>
-                  {{ t.type }}
+                  {{ getTypeArabic(t.type) }}
                 </span>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="category">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Category</th>
-              <td mat-cell *matCellDef="let t">{{ t.category }}</td>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>الفئة</th>
+              <td mat-cell *matCellDef="let t">{{ getCategoryArabic(t.category) }}</td>
             </ng-container>
 
             <ng-container matColumnDef="description">
-              <th mat-header-cell *matHeaderCellDef>Description</th>
+              <th mat-header-cell *matHeaderCellDef>الوصف</th>
               <td mat-cell *matCellDef="let t">{{ t.description | truncate:40 }}</td>
             </ng-container>
 
             <ng-container matColumnDef="amount">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Amount</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>المبلغ</th>
               <td mat-cell *matCellDef="let t" [ngClass]="getAmountClass(t.type)">
                 {{ t.type === 'Expense' ? '-' : '+' }}{{ t.amount | currencyFormat }}
               </td>
             </ng-container>
 
             <ng-container matColumnDef="status">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>الحالة</th>
               <td mat-cell *matCellDef="let t">
                 <span class="status-badge" [ngClass]="'status-' + t.status.toLowerCase()">
                   <span class="status-dot"></span>
-                  {{ t.status }}
+                  {{ getStatusArabic(t.status) }}
                 </span>
               </td>
             </ng-container>
@@ -160,7 +160,7 @@ import { Transaction, TransactionType, TransactionStatus, FinancialSummary, Pagi
               <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">
                 <div class="empty-state">
                   <mat-icon>receipt_long</mat-icon>
-                  <span>No transactions found</span>
+                  <span>لا توجد معاملات</span>
                 </div>
               </td>
             </tr>
@@ -600,6 +600,36 @@ export class FinanceComponent implements OnInit {
 
   getAmountClass(type: string): string {
     return type === 'Expense' ? 'amount-expense' : 'amount-income';
+  }
+
+  getTypeArabic(type: string): string {
+    const types: { [key: string]: string } = {
+      Income: 'دخل',
+      Expense: 'مصروف',
+      Transfer: 'تحويل'
+    };
+    return types[type] || type;
+  }
+
+  getStatusArabic(status: string): string {
+    const statuses: { [key: string]: string } = {
+      Pending: 'قيد الانتظار',
+      Completed: 'مكتمل',
+      Cancelled: 'ملغي'
+    };
+    return statuses[status] || status;
+  }
+
+  getCategoryArabic(category: string): string {
+    const categories: { [key: string]: string } = {
+      Sales: 'مبيعات',
+      Services: 'خدمات',
+      'Office Supplies': 'مستلزمات مكتبية',
+      Utilities: 'مرافق',
+      Rent: 'إيجار',
+      Salaries: 'رواتب'
+    };
+    return categories[category] || category;
   }
 
   private getMockSummary(): FinancialSummary {

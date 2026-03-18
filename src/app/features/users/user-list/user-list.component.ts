@@ -13,11 +13,11 @@ import { UserFormComponent } from '../user-form/user-form.component';
   template: `
     <div class="user-list-container">
       <app-page-header
-        title="User Management"
-        subtitle="Manage system users and permissions"
-        [breadcrumb]="['Dashboard', 'Users']"
+        title="إدارة المستخدمين"
+        subtitle="إدارة مستخدمي النظام والصلاحيات"
+        [breadcrumb]="['لوحة التحكم', 'المستخدمين']"
         [showAddButton]="true"
-        addButtonText="Add User"
+        addButtonText="إضافة مستخدم"
         (onAdd)="openUserForm()">
       </app-page-header>
 
@@ -25,27 +25,27 @@ import { UserFormComponent } from '../user-form/user-form.component';
         <div class="card-toolbar">
           <div class="search-box">
             <mat-icon>search</mat-icon>
-            <input type="text" (keyup)="onSearch($event)" placeholder="Search users...">
+            <input type="text" (keyup)="onSearch($event)" placeholder="البحث عن المستخدمين...">
           </div>
 
           <div class="filters">
             <div class="filter-group">
-              <label>Role</label>
+              <label>الدور</label>
               <select (change)="onRoleFilter($any($event.target).value)">
-                <option value="">All Roles</option>
-                <option value="Admin">Admin</option>
-                <option value="Manager">Manager</option>
-                <option value="Employee">Employee</option>
-                <option value="Viewer">Viewer</option>
+                <option value="">جميع الأدوار</option>
+                <option value="Admin">مدير</option>
+                <option value="Manager">مشرف</option>
+                <option value="Employee">موظف</option>
+                <option value="Viewer">مشاهد</option>
               </select>
             </div>
 
             <div class="filter-group">
-              <label>Status</label>
+              <label>الحالة</label>
               <select (change)="onStatusFilter($any($event.target).value)">
-                <option value="">All</option>
-                <option value="true">Active</option>
-                <option value="false">Inactive</option>
+                <option value="">الكل</option>
+                <option value="true">نشط</option>
+                <option value="false">غير نشط</option>
               </select>
             </div>
           </div>
@@ -54,7 +54,7 @@ import { UserFormComponent } from '../user-form/user-form.component';
         <div class="table-container">
           <table mat-table [dataSource]="users" matSort (matSortChange)="onSortChange($event)">
             <ng-container matColumnDef="username">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Username</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>اسم المستخدم</th>
               <td mat-cell *matCellDef="let user">
                 <div class="user-cell">
                   <div class="user-avatar">{{ user.firstName?.charAt(0) }}{{ user.lastName?.charAt(0) }}</div>
@@ -64,48 +64,48 @@ import { UserFormComponent } from '../user-form/user-form.component';
             </ng-container>
 
             <ng-container matColumnDef="email">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Email</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>البريد الإلكتروني</th>
               <td mat-cell *matCellDef="let user">{{ user.email }}</td>
             </ng-container>
 
             <ng-container matColumnDef="firstName">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>الاسم</th>
               <td mat-cell *matCellDef="let user">{{ user.firstName }} {{ user.lastName }}</td>
             </ng-container>
 
             <ng-container matColumnDef="role">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Role</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>الدور</th>
               <td mat-cell *matCellDef="let user">
-                <span class="role-badge" [ngClass]="'role-' + user.role.toLowerCase()">{{ user.role }}</span>
+                <span class="role-badge" [ngClass]="'role-' + user.role.toLowerCase()">{{ getRoleArabic(user.role) }}</span>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="isActive">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>الحالة</th>
               <td mat-cell *matCellDef="let user">
                 <span class="status-badge" [ngClass]="user.isActive ? 'active' : 'inactive'">
                   <span class="status-dot"></span>
-                  {{ user.isActive ? 'Active' : 'Inactive' }}
+                  {{ user.isActive ? 'نشط' : 'غير نشط' }}
                 </span>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="createdAt">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Created</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>تاريخ الإنشاء</th>
               <td mat-cell *matCellDef="let user">{{ user.createdAt | date:'mediumDate' }}</td>
             </ng-container>
 
             <ng-container matColumnDef="actions">
-              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <th mat-header-cell *matHeaderCellDef>الإجراءات</th>
               <td mat-cell *matCellDef="let user">
                 <div class="action-buttons">
-                  <button class="action-btn" matTooltip="Edit" (click)="openUserForm(user)">
+                  <button class="action-btn" matTooltip="تعديل" (click)="openUserForm(user)">
                     <mat-icon>edit</mat-icon>
                   </button>
-                  <button class="action-btn" matTooltip="Toggle Status" (click)="toggleUserStatus(user)">
+                  <button class="action-btn" matTooltip="تغيير الحالة" (click)="toggleUserStatus(user)">
                     <mat-icon>{{ user.isActive ? 'block' : 'check_circle' }}</mat-icon>
                   </button>
-                  <button class="action-btn danger" matTooltip="Delete" (click)="deleteUser(user)">
+                  <button class="action-btn danger" matTooltip="حذف" (click)="deleteUser(user)">
                     <mat-icon>delete</mat-icon>
                   </button>
                 </div>
@@ -119,7 +119,7 @@ import { UserFormComponent } from '../user-form/user-form.component';
               <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">
                 <div class="empty-state">
                   <mat-icon>people_outline</mat-icon>
-                  <span>No users found</span>
+                  <span>لا يوجد مستخدمين</span>
                 </div>
               </td>
             </tr>
@@ -465,12 +465,12 @@ export class UserListComponent implements OnInit {
   }
 
   toggleUserStatus(user: User): void {
-    const action = user.isActive ? 'deactivate' : 'activate';
+    const action = user.isActive ? 'تعطيل' : 'تفعيل';
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
-        title: `${user.isActive ? 'Deactivate' : 'Activate'} User`,
-        message: `Are you sure you want to ${action} ${user.username}?`,
-        confirmText: user.isActive ? 'Deactivate' : 'Activate',
+        title: `${action} المستخدم`,
+        message: `هل أنت متأكد من ${action} ${user.username}؟`,
+        confirmText: action,
         type: user.isActive ? 'warning' : 'success'
       }
     });
@@ -480,7 +480,7 @@ export class UserListComponent implements OnInit {
         this.apiService.patch(`users/${user.id}/status`, { isActive: !user.isActive })
           .subscribe({
             next: () => {
-              this.notificationService.showSuccess(`User ${action}d successfully`);
+              this.notificationService.showSuccess(`تم ${action} المستخدم بنجاح`);
               this.loadUsers();
             }
           });
@@ -491,9 +491,9 @@ export class UserListComponent implements OnInit {
   deleteUser(user: User): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
-        title: 'Delete User',
-        message: `Are you sure you want to delete ${user.username}? This action cannot be undone.`,
-        confirmText: 'Delete',
+        title: 'حذف المستخدم',
+        message: `هل أنت متأكد من حذف ${user.username}؟ لا يمكن التراجع عن هذا الإجراء.`,
+        confirmText: 'حذف',
         type: 'danger'
       }
     });
@@ -502,7 +502,7 @@ export class UserListComponent implements OnInit {
       if (result) {
         this.apiService.delete(`users/${user.id}`).subscribe({
           next: () => {
-            this.notificationService.showSuccess('User deleted successfully');
+            this.notificationService.showSuccess('تم حذف المستخدم بنجاح');
             this.loadUsers();
           }
         });
@@ -510,12 +510,22 @@ export class UserListComponent implements OnInit {
     });
   }
 
+  getRoleArabic(role: string): string {
+    const roles: { [key: string]: string } = {
+      Admin: 'مدير',
+      Manager: 'مشرف',
+      Employee: 'موظف',
+      Viewer: 'مشاهد'
+    };
+    return roles[role] || role;
+  }
+
   private getMockUsers(): User[] {
     return [
-      { id: 1, username: 'admin', email: 'admin@erp.com', firstName: 'Admin', lastName: 'User', role: 'Admin' as any, isActive: true, createdAt: new Date() },
-      { id: 2, username: 'manager1', email: 'manager@erp.com', firstName: 'John', lastName: 'Manager', role: 'Manager' as any, isActive: true, createdAt: new Date() },
-      { id: 3, username: 'employee1', email: 'emp1@erp.com', firstName: 'Jane', lastName: 'Employee', role: 'Employee' as any, isActive: true, createdAt: new Date() },
-      { id: 4, username: 'viewer1', email: 'viewer@erp.com', firstName: 'Bob', lastName: 'Viewer', role: 'Viewer' as any, isActive: false, createdAt: new Date() }
+      { id: 1, username: 'admin', email: 'admin@erp.com', firstName: 'أحمد', lastName: 'محمد', role: 'Admin' as any, isActive: true, createdAt: new Date() },
+      { id: 2, username: 'manager1', email: 'manager@erp.com', firstName: 'سارة', lastName: 'علي', role: 'Manager' as any, isActive: true, createdAt: new Date() },
+      { id: 3, username: 'employee1', email: 'emp1@erp.com', firstName: 'خالد', lastName: 'عبدالله', role: 'Employee' as any, isActive: true, createdAt: new Date() },
+      { id: 4, username: 'viewer1', email: 'viewer@erp.com', firstName: 'نورة', lastName: 'سعيد', role: 'Viewer' as any, isActive: false, createdAt: new Date() }
     ];
   }
 }

@@ -11,17 +11,17 @@ import * as signalR from '@microsoft/signalr';
   template: `
     <div class="notifications-container">
       <app-page-header
-        title="Notifications"
-        subtitle="View and manage your notifications"
-        [breadcrumb]="['Dashboard', 'Notifications']">
+        title="الإشعارات"
+        subtitle="عرض وإدارة الإشعارات الخاصة بك"
+        [breadcrumb]="['لوحة التحكم', 'الإشعارات']">
         <div actions>
           <span class="connection-status" [ngClass]="connectionState.toLowerCase()">
             <span class="status-dot"></span>
-            {{ connectionState }}
+            {{ getConnectionStateArabic(connectionState) }}
           </span>
           <button class="btn-mark-all" (click)="markAllAsRead()" [disabled]="unreadCount === 0">
             <mat-icon>done_all</mat-icon>
-            Mark All as Read
+            تحديد الكل كمقروء
           </button>
         </div>
       </app-page-header>
@@ -30,20 +30,20 @@ import * as signalR from '@microsoft/signalr';
       <div class="filters-section">
         <div class="filter-chips">
           <button class="filter-chip" [class.active]="typeFilter === ''" (click)="onFilterChange('')">
-            All
+            الكل
             <span class="chip-count">{{ totalItems }}</span>
           </button>
           <button class="filter-chip" *ngFor="let type of notificationTypes"
                   [class.active]="typeFilter === type"
                   (click)="onFilterChange(type)">
-            {{ type }}
+            {{ getTypeArabic(type) }}
           </button>
         </div>
 
         <label class="toggle-switch">
           <input type="checkbox" [(ngModel)]="showUnreadOnly" (change)="loadNotifications()">
           <span class="toggle-slider"></span>
-          <span class="toggle-label">Unread only</span>
+          <span class="toggle-label">غير المقروءة فقط</span>
         </label>
       </div>
 
@@ -65,14 +65,14 @@ import * as signalR from '@microsoft/signalr';
             <p>{{ notification.message }}</p>
             <div class="notification-footer">
               <span class="notification-type" [ngClass]="'type-' + notification.type.toLowerCase()">
-                {{ notification.type }}
+                {{ getTypeArabic(notification.type) }}
               </span>
               <div class="notification-actions" (click)="$event.stopPropagation()">
-                <button class="action-btn" matTooltip="Mark as read" *ngIf="!notification.isRead"
+                <button class="action-btn" matTooltip="تحديد كمقروء" *ngIf="!notification.isRead"
                         (click)="markAsRead(notification)">
                   <mat-icon>check</mat-icon>
                 </button>
-                <button class="action-btn danger" matTooltip="Delete"
+                <button class="action-btn danger" matTooltip="حذف"
                         (click)="deleteNotification(notification)">
                   <mat-icon>delete</mat-icon>
                 </button>
@@ -88,8 +88,8 @@ import * as signalR from '@microsoft/signalr';
       <app-empty-state
         *ngIf="notifications.length === 0"
         icon="notifications_none"
-        title="No notifications"
-        message="You're all caught up! New notifications will appear here."
+        title="لا توجد إشعارات"
+        message="أنت على اطلاع! ستظهر الإشعارات الجديدة هنا."
         color="primary">
       </app-empty-state>
 
@@ -205,7 +205,8 @@ import * as signalR from '@microsoft/signalr';
       border-radius: 20px;
       font-size: 12px;
       font-weight: 500;
-      margin-right: 12px;
+      margin-left: 12px;
+      margin-right: 0;
     }
 
     .connection-status .status-dot {
@@ -270,13 +271,14 @@ import * as signalR from '@microsoft/signalr';
     }
 
     .notification-card:hover {
-      transform: translateX(4px);
+      transform: translateX(-4px);
       box-shadow: var(--shadow-lg);
     }
 
     .notification-card.unread {
       background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, var(--card-bg) 100%);
-      border-left: 3px solid var(--primary-color);
+      border-right: 3px solid var(--primary-color);
+      border-left: none;
     }
 
     .notification-icon {
@@ -395,7 +397,8 @@ import * as signalR from '@microsoft/signalr';
     .unread-indicator {
       position: absolute;
       top: 20px;
-      right: 20px;
+      left: 20px;
+      right: auto;
       width: 10px;
       height: 10px;
       background: var(--primary-color);
@@ -517,12 +520,34 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     return icons[type] || 'notifications';
   }
 
+  getTypeArabic(type: string): string {
+    const types: { [key: string]: string } = {
+      Info: 'معلومات',
+      Success: 'نجاح',
+      Warning: 'تحذير',
+      Error: 'خطأ',
+      Order: 'طلب',
+      Inventory: 'مخزون',
+      System: 'نظام'
+    };
+    return types[type] || type;
+  }
+
+  getConnectionStateArabic(state: string): string {
+    const states: { [key: string]: string } = {
+      Connected: 'متصل',
+      Disconnected: 'غير متصل',
+      Reconnecting: 'إعادة الاتصال'
+    };
+    return states[state] || state;
+  }
+
   private getMockNotifications(): Notification[] {
     return [
-      { id: 1, userId: 1, title: 'New Order Received', message: 'Order #ORD-2024-001 has been placed by John Doe.', type: NotificationType.Order, isRead: false, createdAt: new Date() },
-      { id: 2, userId: 1, title: 'Low Stock Alert', message: 'Product "Monitor 27" is running low on stock. Current quantity: 5', type: NotificationType.Inventory, isRead: false, createdAt: new Date(Date.now() - 3600000) },
-      { id: 3, userId: 1, title: 'System Update', message: 'The system will undergo maintenance tonight from 2 AM to 4 AM.', type: NotificationType.System, isRead: true, createdAt: new Date(Date.now() - 86400000) },
-      { id: 4, userId: 1, title: 'Order Shipped', message: 'Order #ORD-2024-002 has been shipped to the customer.', type: NotificationType.Success, isRead: true, createdAt: new Date(Date.now() - 172800000) }
+      { id: 1, userId: 1, title: 'تم استلام طلب جديد', message: 'تم تقديم الطلب #ORD-2024-001 بواسطة أحمد محمد.', type: NotificationType.Order, isRead: false, createdAt: new Date() },
+      { id: 2, userId: 1, title: 'تنبيه مخزون منخفض', message: 'المنتج "شاشة 27 بوصة" على وشك النفاد. الكمية الحالية: 5', type: NotificationType.Inventory, isRead: false, createdAt: new Date(Date.now() - 3600000) },
+      { id: 3, userId: 1, title: 'تحديث النظام', message: 'سيخضع النظام للصيانة الليلة من الساعة 2 صباحاً حتى 4 صباحاً.', type: NotificationType.System, isRead: true, createdAt: new Date(Date.now() - 86400000) },
+      { id: 4, userId: 1, title: 'تم شحن الطلب', message: 'تم شحن الطلب #ORD-2024-002 إلى العميل.', type: NotificationType.Success, isRead: true, createdAt: new Date(Date.now() - 172800000) }
     ];
   }
 }

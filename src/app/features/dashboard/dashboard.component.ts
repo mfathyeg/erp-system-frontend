@@ -44,17 +44,17 @@ interface TeamMember {
       <!-- Header -->
       <div class="dashboard-header">
         <div class="header-content">
-          <h1>Welcome back, John!</h1>
-          <p>Here's what's happening with your business today.</p>
+          <h1>مرحباً بعودتك، أحمد!</h1>
+          <p>إليك ما يحدث في عملك اليوم.</p>
         </div>
         <div class="header-actions">
           <button class="btn-outline">
             <mat-icon>download</mat-icon>
-            Export Report
+            تصدير التقرير
           </button>
           <button class="btn-gradient">
             <mat-icon>add</mat-icon>
-            New Order
+            طلب جديد
           </button>
         </div>
       </div>
@@ -88,8 +88,8 @@ interface TeamMember {
         <!-- Recent Orders -->
         <div class="card orders-card">
           <div class="card-header">
-            <h3>Recent Orders</h3>
-            <button class="btn-text">View All</button>
+            <h3>أحدث الطلبات</h3>
+            <button class="btn-text">عرض الكل</button>
           </div>
           <div class="orders-table">
             <div class="order-row" *ngFor="let order of recentOrders">
@@ -117,12 +117,12 @@ interface TeamMember {
         <div class="card chart-card">
           <div class="card-header">
             <div>
-              <h3>Revenue Overview</h3>
-              <p class="card-subtitle">Monthly revenue comparison</p>
+              <h3>نظرة عامة على الإيرادات</h3>
+              <p class="card-subtitle">مقارنة الإيرادات الشهرية</p>
             </div>
             <div class="chart-legend">
-              <span class="legend-item"><span class="dot primary"></span> This Year</span>
-              <span class="legend-item"><span class="dot secondary"></span> Last Year</span>
+              <span class="legend-item"><span class="dot primary"></span> هذا العام</span>
+              <span class="legend-item"><span class="dot secondary"></span> العام الماضي</span>
             </div>
           </div>
           <div class="chart-container">
@@ -139,8 +139,8 @@ interface TeamMember {
         <!-- Top Products -->
         <div class="card products-card">
           <div class="card-header">
-            <h3>Top Products</h3>
-            <button class="btn-text">View All</button>
+            <h3>أفضل المنتجات</h3>
+            <button class="btn-text">عرض الكل</button>
           </div>
           <div class="products-list">
             <div class="product-item" *ngFor="let product of topProducts">
@@ -151,7 +151,7 @@ interface TeamMember {
               <div class="product-stats">
                 <div class="product-sales">
                   <span class="sales-count">{{ product.sales }}</span>
-                  <span class="sales-label">sales</span>
+                  <span class="sales-label">مبيعات</span>
                 </div>
                 <div class="product-revenue">{{ product.revenue | currency }}</div>
               </div>
@@ -171,8 +171,8 @@ interface TeamMember {
         <!-- Team Performance -->
         <div class="card team-card">
           <div class="card-header">
-            <h3>Team Performance</h3>
-            <button class="btn-text">View All</button>
+            <h3>أداء الفريق</h3>
+            <button class="btn-text">عرض الكل</button>
           </div>
           <div class="team-list">
             <div class="team-member" *ngFor="let member of teamMembers">
@@ -484,11 +484,11 @@ interface TeamMember {
       font-weight: 500;
     }
 
-    .status-badge.pending { background: rgba(245, 158, 11, 0.15); color: var(--warning-color); }
-    .status-badge.processing { background: rgba(59, 130, 246, 0.15); color: var(--info-color); }
-    .status-badge.shipped { background: rgba(139, 92, 246, 0.15); color: var(--accent-color); }
-    .status-badge.delivered { background: rgba(16, 185, 129, 0.15); color: var(--success-color); }
-    .status-badge.cancelled { background: rgba(239, 68, 68, 0.15); color: var(--danger-color); }
+    .status-badge.pending, .status-badge.قيد-الانتظار { background: rgba(245, 158, 11, 0.15); color: var(--warning-color); }
+    .status-badge.processing, .status-badge.قيد-المعالجة { background: rgba(59, 130, 246, 0.15); color: var(--info-color); }
+    .status-badge.shipped, .status-badge.تم-الشحن { background: rgba(139, 92, 246, 0.15); color: var(--accent-color); }
+    .status-badge.delivered, .status-badge.تم-التسليم { background: rgba(16, 185, 129, 0.15); color: var(--success-color); }
+    .status-badge.cancelled, .status-badge.ملغي { background: rgba(239, 68, 68, 0.15); color: var(--danger-color); }
 
     .order-date {
       color: var(--text-muted);
@@ -610,7 +610,7 @@ interface TeamMember {
     .product-stats {
       display: flex;
       flex-direction: column;
-      align-items: flex-end;
+      align-items: flex-start;
     }
 
     .sales-count {
@@ -712,7 +712,8 @@ interface TeamMember {
     .status-dot {
       position: absolute;
       bottom: -2px;
-      right: -2px;
+      left: -2px;
+      right: auto;
       width: 12px;
       height: 12px;
       border-radius: 50%;
@@ -737,7 +738,7 @@ interface TeamMember {
     .tasks-progress {
       display: flex;
       flex-direction: column;
-      align-items: flex-end;
+      align-items: flex-start;
       gap: 6px;
       min-width: 100px;
     }
@@ -784,41 +785,41 @@ interface TeamMember {
 })
 export class DashboardComponent implements OnInit {
   stats: StatCard[] = [
-    { title: 'Total Revenue', value: '$45,231', change: 12.5, changeLabel: 'from last month', icon: 'account_balance_wallet', gradient: 'primary' },
-    { title: 'Total Orders', value: '1,234', change: 8.2, changeLabel: 'from last month', icon: 'shopping_cart', gradient: 'success' },
-    { title: 'New Customers', value: '456', change: -2.4, changeLabel: 'from last month', icon: 'people', gradient: 'warning' },
-    { title: 'Conversion Rate', value: '3.24%', change: 4.1, changeLabel: 'from last month', icon: 'trending_up', gradient: 'info' }
+    { title: 'إجمالي الإيرادات', value: '٤٥,٢٣١ ر.س', change: 12.5, changeLabel: 'من الشهر الماضي', icon: 'account_balance_wallet', gradient: 'primary' },
+    { title: 'إجمالي الطلبات', value: '١,٢٣٤', change: 8.2, changeLabel: 'من الشهر الماضي', icon: 'shopping_cart', gradient: 'success' },
+    { title: 'عملاء جدد', value: '٤٥٦', change: -2.4, changeLabel: 'من الشهر الماضي', icon: 'people', gradient: 'warning' },
+    { title: 'معدل التحويل', value: '٣.٢٤٪', change: 4.1, changeLabel: 'من الشهر الماضي', icon: 'trending_up', gradient: 'info' }
   ];
 
   recentOrders: RecentOrder[] = [
-    { id: '#ORD-7352', customer: 'Sarah Johnson', avatar: 'https://ui-avatars.com/api/?name=Sarah+Johnson&background=6366f1&color=fff', product: 'MacBook Pro 16"', amount: 2499, status: 'Delivered', date: new Date() },
-    { id: '#ORD-7351', customer: 'Michael Chen', avatar: 'https://ui-avatars.com/api/?name=Michael+Chen&background=10b981&color=fff', product: 'iPhone 15 Pro', amount: 1199, status: 'Processing', date: new Date(Date.now() - 86400000) },
-    { id: '#ORD-7350', customer: 'Emily Davis', avatar: 'https://ui-avatars.com/api/?name=Emily+Davis&background=f59e0b&color=fff', product: 'AirPods Pro', amount: 249, status: 'Shipped', date: new Date(Date.now() - 172800000) },
-    { id: '#ORD-7349', customer: 'James Wilson', avatar: 'https://ui-avatars.com/api/?name=James+Wilson&background=ef4444&color=fff', product: 'iPad Air', amount: 799, status: 'Pending', date: new Date(Date.now() - 259200000) },
-    { id: '#ORD-7348', customer: 'Lisa Anderson', avatar: 'https://ui-avatars.com/api/?name=Lisa+Anderson&background=8b5cf6&color=fff', product: 'Apple Watch', amount: 399, status: 'Delivered', date: new Date(Date.now() - 345600000) }
+    { id: '#ORD-7352', customer: 'سارة أحمد', avatar: 'https://ui-avatars.com/api/?name=سارة+أحمد&background=6366f1&color=fff', product: 'ماك بوك برو 16"', amount: 2499, status: 'تم التسليم', date: new Date() },
+    { id: '#ORD-7351', customer: 'محمد علي', avatar: 'https://ui-avatars.com/api/?name=محمد+علي&background=10b981&color=fff', product: 'آيفون 15 برو', amount: 1199, status: 'قيد المعالجة', date: new Date(Date.now() - 86400000) },
+    { id: '#ORD-7350', customer: 'فاطمة خالد', avatar: 'https://ui-avatars.com/api/?name=فاطمة+خالد&background=f59e0b&color=fff', product: 'إيربودز برو', amount: 249, status: 'تم الشحن', date: new Date(Date.now() - 172800000) },
+    { id: '#ORD-7349', customer: 'عمر حسن', avatar: 'https://ui-avatars.com/api/?name=عمر+حسن&background=ef4444&color=fff', product: 'آيباد إير', amount: 799, status: 'قيد الانتظار', date: new Date(Date.now() - 259200000) },
+    { id: '#ORD-7348', customer: 'نورة سعيد', avatar: 'https://ui-avatars.com/api/?name=نورة+سعيد&background=8b5cf6&color=fff', product: 'ساعة أبل', amount: 399, status: 'تم التسليم', date: new Date(Date.now() - 345600000) }
   ];
 
   topProducts: TopProduct[] = [
-    { name: 'MacBook Pro 16"', category: 'Laptops', sales: 234, revenue: 584766, progress: 85, trend: 'up' },
-    { name: 'iPhone 15 Pro Max', category: 'Smartphones', sales: 189, revenue: 226611, progress: 72, trend: 'up' },
-    { name: 'iPad Pro 12.9"', category: 'Tablets', sales: 156, revenue: 171444, progress: 63, trend: 'down' },
-    { name: 'AirPods Pro', category: 'Audio', sales: 312, revenue: 77688, progress: 91, trend: 'up' }
+    { name: 'ماك بوك برو 16"', category: 'أجهزة لابتوب', sales: 234, revenue: 584766, progress: 85, trend: 'up' },
+    { name: 'آيفون 15 برو ماكس', category: 'هواتف ذكية', sales: 189, revenue: 226611, progress: 72, trend: 'up' },
+    { name: 'آيباد برو 12.9"', category: 'أجهزة لوحية', sales: 156, revenue: 171444, progress: 63, trend: 'down' },
+    { name: 'إيربودز برو', category: 'صوتيات', sales: 312, revenue: 77688, progress: 91, trend: 'up' }
   ];
 
   teamMembers: TeamMember[] = [
-    { name: 'Alex Thompson', role: 'Sales Manager', avatar: 'https://ui-avatars.com/api/?name=Alex+Thompson&background=6366f1&color=fff', tasks: 12, completedTasks: 10, status: 'online' },
-    { name: 'Maria Garcia', role: 'Marketing Lead', avatar: 'https://ui-avatars.com/api/?name=Maria+Garcia&background=10b981&color=fff', tasks: 8, completedTasks: 6, status: 'busy' },
-    { name: 'David Kim', role: 'Developer', avatar: 'https://ui-avatars.com/api/?name=David+Kim&background=f59e0b&color=fff', tasks: 15, completedTasks: 14, status: 'online' },
-    { name: 'Sophie Martin', role: 'Designer', avatar: 'https://ui-avatars.com/api/?name=Sophie+Martin&background=ec4899&color=fff', tasks: 10, completedTasks: 8, status: 'offline' }
+    { name: 'علي الحربي', role: 'مدير المبيعات', avatar: 'https://ui-avatars.com/api/?name=علي+الحربي&background=6366f1&color=fff', tasks: 12, completedTasks: 10, status: 'online' },
+    { name: 'مريم القحطاني', role: 'قائد التسويق', avatar: 'https://ui-avatars.com/api/?name=مريم+القحطاني&background=10b981&color=fff', tasks: 8, completedTasks: 6, status: 'busy' },
+    { name: 'خالد العمري', role: 'مطور', avatar: 'https://ui-avatars.com/api/?name=خالد+العمري&background=f59e0b&color=fff', tasks: 15, completedTasks: 14, status: 'online' },
+    { name: 'هند السالم', role: 'مصممة', avatar: 'https://ui-avatars.com/api/?name=هند+السالم&background=ec4899&color=fff', tasks: 10, completedTasks: 8, status: 'offline' }
   ];
 
   chartData = [
-    { label: 'Jan', current: 65, previous: 45 },
-    { label: 'Feb', current: 75, previous: 55 },
-    { label: 'Mar', current: 55, previous: 65 },
-    { label: 'Apr', current: 85, previous: 50 },
-    { label: 'May', current: 70, previous: 60 },
-    { label: 'Jun', current: 90, previous: 70 }
+    { label: 'يناير', current: 65, previous: 45 },
+    { label: 'فبراير', current: 75, previous: 55 },
+    { label: 'مارس', current: 55, previous: 65 },
+    { label: 'أبريل', current: 85, previous: 50 },
+    { label: 'مايو', current: 70, previous: 60 },
+    { label: 'يونيو', current: 90, previous: 70 }
   ];
 
   ngOnInit(): void {}

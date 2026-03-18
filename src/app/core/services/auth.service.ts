@@ -13,17 +13,18 @@ export class AuthService {
   private readonly REFRESH_TOKEN_KEY = 'erp_refresh_token';
   private readonly USER_KEY = 'erp_user';
 
-  // Demo users for testing without backend
+  // Demo users for testing without backend (fallback)
+  // When connected to backend, use: admin/Admin123!, manager/Manager123!, user/User123!
   private readonly DEMO_USERS: { username: string; password: string; user: User }[] = [
     {
       username: 'admin',
-      password: 'admin123',
+      password: 'Admin123!',
       user: {
-        id: 1,
+        id: '00000000-0000-0000-0000-000000000001',
         username: 'admin',
-        email: 'admin@duralux.com',
-        firstName: 'John',
-        lastName: 'Anderson',
+        email: 'admin@duralux.sa',
+        firstName: 'أحمد',
+        lastName: 'محمد',
         role: UserRole.Admin,
         isActive: true,
         createdAt: new Date()
@@ -31,13 +32,13 @@ export class AuthService {
     },
     {
       username: 'manager',
-      password: 'manager123',
+      password: 'Manager123!',
       user: {
-        id: 2,
+        id: '00000000-0000-0000-0000-000000000002',
         username: 'manager',
-        email: 'manager@duralux.com',
-        firstName: 'Sarah',
-        lastName: 'Johnson',
+        email: 'manager@duralux.sa',
+        firstName: 'سارة',
+        lastName: 'علي',
         role: UserRole.Manager,
         isActive: true,
         createdAt: new Date()
@@ -45,13 +46,13 @@ export class AuthService {
     },
     {
       username: 'user',
-      password: 'user123',
+      password: 'User123!',
       user: {
-        id: 3,
+        id: '00000000-0000-0000-0000-000000000003',
         username: 'user',
-        email: 'user@duralux.com',
-        firstName: 'Mike',
-        lastName: 'Wilson',
+        email: 'user@duralux.sa',
+        firstName: 'محمد',
+        lastName: 'خالد',
         role: UserRole.Employee,
         isActive: true,
         createdAt: new Date()
@@ -94,7 +95,7 @@ export class AuthService {
     // If not a demo user, check if credentials were provided but wrong
     const isAttemptingDemoLogin = this.DEMO_USERS.some(u => u.username === credentials.username);
     if (isAttemptingDemoLogin) {
-      return throwError(() => new Error('Invalid password. Try: admin123, manager123, or user123'));
+      return throwError(() => new Error('كلمة المرور غير صحيحة. جرب: Admin123!, Manager123!, أو User123!'));
     }
 
     // Try real API (will fail if no backend)

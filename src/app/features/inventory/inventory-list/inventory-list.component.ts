@@ -13,11 +13,11 @@ import { InventoryFormComponent } from '../inventory-form/inventory-form.compone
   template: `
     <div class="inventory-container">
       <app-page-header
-        title="Inventory Management"
-        subtitle="Manage your inventory items and stock levels"
-        [breadcrumb]="['Dashboard', 'Inventory']"
+        title="إدارة المخزون"
+        subtitle="إدارة عناصر المخزون ومستويات المخزون"
+        [breadcrumb]="['لوحة التحكم', 'المخزون']"
         [showAddButton]="true"
-        addButtonText="Add Item"
+        addButtonText="إضافة عنصر"
         (onAdd)="openItemForm()">
       </app-page-header>
 
@@ -29,7 +29,7 @@ import { InventoryFormComponent } from '../inventory-form/inventory-form.compone
           </div>
           <div class="stat-info">
             <span class="stat-value">{{ totalItems }}</span>
-            <span class="stat-label">Total Items</span>
+            <span class="stat-label">إجمالي العناصر</span>
           </div>
         </div>
         <div class="stat-card">
@@ -38,7 +38,7 @@ import { InventoryFormComponent } from '../inventory-form/inventory-form.compone
           </div>
           <div class="stat-info">
             <span class="stat-value">{{ inStockCount }}</span>
-            <span class="stat-label">In Stock</span>
+            <span class="stat-label">متوفر</span>
           </div>
         </div>
         <div class="stat-card">
@@ -47,7 +47,7 @@ import { InventoryFormComponent } from '../inventory-form/inventory-form.compone
           </div>
           <div class="stat-info">
             <span class="stat-value">{{ lowStockCount }}</span>
-            <span class="stat-label">Low Stock</span>
+            <span class="stat-label">مخزون منخفض</span>
           </div>
         </div>
         <div class="stat-card">
@@ -56,7 +56,7 @@ import { InventoryFormComponent } from '../inventory-form/inventory-form.compone
           </div>
           <div class="stat-info">
             <span class="stat-value">{{ outOfStockCount }}</span>
-            <span class="stat-label">Out of Stock</span>
+            <span class="stat-label">نفد المخزون</span>
           </div>
         </div>
       </div>
@@ -65,20 +65,20 @@ import { InventoryFormComponent } from '../inventory-form/inventory-form.compone
         <div class="card-toolbar">
           <div class="search-box">
             <mat-icon>search</mat-icon>
-            <input type="text" (keyup)="onSearch($event)" placeholder="Search items...">
+            <input type="text" (keyup)="onSearch($event)" placeholder="البحث عن العناصر...">
           </div>
 
           <div class="filters">
             <select (change)="onCategoryFilter($any($event.target).value)">
-              <option value="">All Categories</option>
-              <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+              <option value="">جميع الفئات</option>
+              <option *ngFor="let cat of categories" [value]="cat">{{ getCategoryArabic(cat) }}</option>
             </select>
 
             <select (change)="onStockFilter($any($event.target).value)">
-              <option value="">All Status</option>
-              <option value="in-stock">In Stock</option>
-              <option value="low-stock">Low Stock</option>
-              <option value="out-of-stock">Out of Stock</option>
+              <option value="">جميع الحالات</option>
+              <option value="in-stock">متوفر</option>
+              <option value="low-stock">مخزون منخفض</option>
+              <option value="out-of-stock">نفد المخزون</option>
             </select>
           </div>
         </div>
@@ -86,14 +86,14 @@ import { InventoryFormComponent } from '../inventory-form/inventory-form.compone
         <div class="table-container">
           <table mat-table [dataSource]="items" matSort (matSortChange)="onSortChange($event)">
             <ng-container matColumnDef="sku">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>SKU</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>رمز المنتج</th>
               <td mat-cell *matCellDef="let item">
                 <span class="sku-code">{{ item.sku }}</span>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="name">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Product</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>المنتج</th>
               <td mat-cell *matCellDef="let item">
                 <div class="product-cell">
                   <div class="product-icon">
@@ -108,14 +108,14 @@ import { InventoryFormComponent } from '../inventory-form/inventory-form.compone
             </ng-container>
 
             <ng-container matColumnDef="category">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Category</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>الفئة</th>
               <td mat-cell *matCellDef="let item">
-                <span class="category-badge">{{ item.category }}</span>
+                <span class="category-badge">{{ getCategoryArabic(item.category) }}</span>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="quantity">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Quantity</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>الكمية</th>
               <td mat-cell *matCellDef="let item">
                 <div class="quantity-cell">
                   <span [ngClass]="getStockClass(item)">{{ item.quantity }}</span>
@@ -127,12 +127,12 @@ import { InventoryFormComponent } from '../inventory-form/inventory-form.compone
             </ng-container>
 
             <ng-container matColumnDef="unitPrice">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Unit Price</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>سعر الوحدة</th>
               <td mat-cell *matCellDef="let item">{{ item.unitPrice | currencyFormat }}</td>
             </ng-container>
 
             <ng-container matColumnDef="status">
-              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <th mat-header-cell *matHeaderCellDef>الحالة</th>
               <td mat-cell *matCellDef="let item">
                 <span class="status-badge" [ngClass]="getStatusClass(item)">
                   <span class="status-dot"></span>
@@ -142,16 +142,16 @@ import { InventoryFormComponent } from '../inventory-form/inventory-form.compone
             </ng-container>
 
             <ng-container matColumnDef="actions">
-              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <th mat-header-cell *matHeaderCellDef>الإجراءات</th>
               <td mat-cell *matCellDef="let item">
                 <div class="action-buttons">
-                  <button class="action-btn" matTooltip="View" (click)="viewItem(item)">
+                  <button class="action-btn" matTooltip="عرض" (click)="viewItem(item)">
                     <mat-icon>visibility</mat-icon>
                   </button>
-                  <button class="action-btn" matTooltip="Edit" (click)="openItemForm(item)">
+                  <button class="action-btn" matTooltip="تعديل" (click)="openItemForm(item)">
                     <mat-icon>edit</mat-icon>
                   </button>
-                  <button class="action-btn danger" matTooltip="Delete" (click)="deleteItem(item)">
+                  <button class="action-btn danger" matTooltip="حذف" (click)="deleteItem(item)">
                     <mat-icon>delete</mat-icon>
                   </button>
                 </div>
@@ -165,7 +165,7 @@ import { InventoryFormComponent } from '../inventory-form/inventory-form.compone
               <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">
                 <div class="empty-state">
                   <mat-icon>inventory_2</mat-icon>
-                  <span>No inventory items found</span>
+                  <span>لا توجد عناصر في المخزون</span>
                 </div>
               </td>
             </tr>
@@ -617,9 +617,9 @@ export class InventoryListComponent implements OnInit {
   deleteItem(item: InventoryItem): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
-        title: 'Delete Item',
-        message: `Are you sure you want to delete "${item.name}"? This action cannot be undone.`,
-        confirmText: 'Delete',
+        title: 'حذف العنصر',
+        message: `هل أنت متأكد من حذف "${item.name}"؟ لا يمكن التراجع عن هذا الإجراء.`,
+        confirmText: 'حذف',
         type: 'danger'
       }
     });
@@ -628,7 +628,7 @@ export class InventoryListComponent implements OnInit {
       if (result) {
         this.apiService.delete(`inventory/${item.id}`).subscribe({
           next: () => {
-            this.notificationService.showSuccess('Item deleted successfully');
+            this.notificationService.showSuccess('تم حذف العنصر بنجاح');
             this.loadItems();
           }
         });
@@ -637,9 +637,20 @@ export class InventoryListComponent implements OnInit {
   }
 
   getStockStatus(item: InventoryItem): string {
-    if (item.quantity === 0) return 'Out of Stock';
-    if (item.quantity <= item.reorderLevel) return 'Low Stock';
-    return 'In Stock';
+    if (item.quantity === 0) return 'نفد المخزون';
+    if (item.quantity <= item.reorderLevel) return 'مخزون منخفض';
+    return 'متوفر';
+  }
+
+  getCategoryArabic(category: string): string {
+    const categories: { [key: string]: string } = {
+      Electronics: 'إلكترونيات',
+      Furniture: 'أثاث',
+      'Office Supplies': 'مستلزمات مكتبية',
+      Hardware: 'أجهزة',
+      Software: 'برمجيات'
+    };
+    return categories[category] || category;
   }
 
   getStatusClass(item: InventoryItem): string {
@@ -661,10 +672,10 @@ export class InventoryListComponent implements OnInit {
 
   private getMockItems(): InventoryItem[] {
     return [
-      { id: 1, sku: 'SKU-001', name: 'Laptop Dell XPS', description: 'High-performance laptop', category: 'Electronics', quantity: 25, unitPrice: 1299.99, reorderLevel: 10, isActive: true, createdAt: new Date() },
-      { id: 2, sku: 'SKU-002', name: 'Office Chair', description: 'Ergonomic office chair', category: 'Furniture', quantity: 5, unitPrice: 299.99, reorderLevel: 10, isActive: true, createdAt: new Date() },
-      { id: 3, sku: 'SKU-003', name: 'Monitor 27"', description: '4K monitor', category: 'Electronics', quantity: 0, unitPrice: 499.99, reorderLevel: 5, isActive: true, createdAt: new Date() },
-      { id: 4, sku: 'SKU-004', name: 'Keyboard', description: 'Mechanical keyboard', category: 'Electronics', quantity: 50, unitPrice: 149.99, reorderLevel: 15, isActive: true, createdAt: new Date() }
+      { id: 1, sku: 'SKU-001', name: 'لابتوب ديل XPS', description: 'لابتوب عالي الأداء', category: 'Electronics', quantity: 25, unitPrice: 1299.99, reorderLevel: 10, isActive: true, createdAt: new Date() },
+      { id: 2, sku: 'SKU-002', name: 'كرسي مكتب', description: 'كرسي مكتب مريح', category: 'Furniture', quantity: 5, unitPrice: 299.99, reorderLevel: 10, isActive: true, createdAt: new Date() },
+      { id: 3, sku: 'SKU-003', name: 'شاشة 27 بوصة', description: 'شاشة 4K', category: 'Electronics', quantity: 0, unitPrice: 499.99, reorderLevel: 5, isActive: true, createdAt: new Date() },
+      { id: 4, sku: 'SKU-004', name: 'لوحة مفاتيح', description: 'لوحة مفاتيح ميكانيكية', category: 'Electronics', quantity: 50, unitPrice: 149.99, reorderLevel: 15, isActive: true, createdAt: new Date() }
     ];
   }
 }

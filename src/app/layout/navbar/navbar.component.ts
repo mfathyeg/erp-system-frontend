@@ -2,6 +2,7 @@ import { Component, Output, EventEmitter, OnInit, OnDestroy } from '@angular/cor
 import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { NotificationService } from '../../core/services/notification.service';
+import { ThemeService } from '../../core/services/theme.service';
 import { User, Notification } from '../../core/models';
 
 @Component({
@@ -16,7 +17,7 @@ import { User, Notification } from '../../core/models';
 
         <div class="search-box">
           <mat-icon class="search-icon">search</mat-icon>
-          <input type="text" placeholder="Search anything..." class="search-input">
+          <input type="text" placeholder="ابحث عن أي شيء..." class="search-input">
           <span class="search-shortcut">Ctrl+K</span>
         </div>
       </div>
@@ -25,36 +26,32 @@ import { User, Notification } from '../../core/models';
       <div class="navbar-right">
         <!-- Language Selector -->
         <button class="nav-btn" [matMenuTriggerFor]="langMenu">
-          <img src="https://flagcdn.com/w20/us.png" alt="EN" class="flag-icon">
-          <span class="lang-text">EN</span>
+          <img src="https://flagcdn.com/w20/sa.png" alt="AR" class="flag-icon">
+          <span class="lang-text">عربي</span>
           <mat-icon class="dropdown-icon">expand_more</mat-icon>
         </button>
         <mat-menu #langMenu="matMenu" class="dropdown-menu">
+          <button mat-menu-item>
+            <img src="https://flagcdn.com/w20/sa.png" alt="AR" class="flag-icon">
+            <span>العربية</span>
+          </button>
           <button mat-menu-item>
             <img src="https://flagcdn.com/w20/us.png" alt="EN" class="flag-icon">
             <span>English</span>
           </button>
           <button mat-menu-item>
-            <img src="https://flagcdn.com/w20/es.png" alt="ES" class="flag-icon">
-            <span>Spanish</span>
-          </button>
-          <button mat-menu-item>
             <img src="https://flagcdn.com/w20/fr.png" alt="FR" class="flag-icon">
-            <span>French</span>
-          </button>
-          <button mat-menu-item>
-            <img src="https://flagcdn.com/w20/de.png" alt="DE" class="flag-icon">
-            <span>German</span>
+            <span>Français</span>
           </button>
         </mat-menu>
 
         <!-- Theme Toggle -->
-        <button class="nav-btn icon-btn" matTooltip="Toggle Theme">
-          <mat-icon>dark_mode</mat-icon>
+        <button class="nav-btn icon-btn theme-toggle" matTooltip="{{ isDarkMode ? 'الوضع النهاري' : 'الوضع الليلي' }}" (click)="toggleTheme()">
+          <mat-icon class="theme-icon">{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
         </button>
 
         <!-- Fullscreen Toggle -->
-        <button class="nav-btn icon-btn" matTooltip="Fullscreen" (click)="toggleFullscreen()">
+        <button class="nav-btn icon-btn" matTooltip="ملء الشاشة" (click)="toggleFullscreen()">
           <mat-icon>{{ isFullscreen ? 'fullscreen_exit' : 'fullscreen' }}</mat-icon>
         </button>
 
@@ -66,9 +63,9 @@ import { User, Notification } from '../../core/models';
         </button>
         <mat-menu #notifMenu="matMenu" class="notification-menu">
           <div class="menu-header">
-            <h4>Notifications</h4>
+            <h4>الإشعارات</h4>
             <button mat-button color="primary" (click)="markAllAsRead()" *ngIf="unreadCount > 0">
-              Mark all read
+              تحديد الكل كمقروء
             </button>
           </div>
           <mat-divider></mat-divider>
@@ -84,12 +81,12 @@ import { User, Notification } from '../../core/models';
             </div>
             <div class="empty-notifications" *ngIf="notifications.length === 0">
               <mat-icon>notifications_none</mat-icon>
-              <p>No new notifications</p>
+              <p>لا توجد إشعارات جديدة</p>
             </div>
           </div>
           <mat-divider></mat-divider>
           <div class="menu-footer">
-            <a mat-button color="primary" routerLink="/notifications">View All Notifications</a>
+            <a mat-button color="primary" routerLink="/notifications">عرض جميع الإشعارات</a>
           </div>
         </mat-menu>
 
@@ -119,20 +116,20 @@ import { User, Notification } from '../../core/models';
           <mat-divider></mat-divider>
           <button mat-menu-item routerLink="/configuration">
             <mat-icon>person</mat-icon>
-            <span>My Profile</span>
+            <span>ملفي الشخصي</span>
           </button>
           <button mat-menu-item routerLink="/configuration">
             <mat-icon>settings</mat-icon>
-            <span>Settings</span>
+            <span>الإعدادات</span>
           </button>
           <button mat-menu-item routerLink="/finance">
             <mat-icon>account_balance_wallet</mat-icon>
-            <span>Billing</span>
+            <span>الفواتير</span>
           </button>
           <mat-divider></mat-divider>
           <button mat-menu-item (click)="logout()" class="logout-btn">
             <mat-icon>logout</mat-icon>
-            <span>Sign Out</span>
+            <span>تسجيل الخروج</span>
           </button>
         </mat-menu>
       </div>
@@ -201,7 +198,8 @@ import { User, Notification } from '../../core/models';
     .search-icon {
       color: var(--text-muted);
       font-size: 20px;
-      margin-right: 12px;
+      margin-left: 12px;
+      margin-right: 0;
     }
 
     .search-input {
@@ -258,6 +256,25 @@ import { User, Notification } from '../../core/models';
       justify-content: center;
     }
 
+    .nav-btn.theme-toggle {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-btn.theme-toggle:hover {
+      border-color: var(--warning-color);
+      background: rgba(245, 158, 11, 0.1);
+    }
+
+    .theme-icon {
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+
+    .nav-btn.theme-toggle:hover .theme-icon {
+      transform: rotate(30deg);
+      color: var(--warning-color);
+    }
+
     .flag-icon {
       width: 20px;
       height: 14px;
@@ -281,11 +298,12 @@ import { User, Notification } from '../../core/models';
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 6px 12px 6px 6px;
+      padding: 6px 6px 6px 12px;
       border-radius: 12px;
       cursor: pointer;
       transition: all 0.2s ease;
-      margin-left: 8px;
+      margin-right: 8px;
+      margin-left: 0;
     }
 
     .user-profile:hover {
@@ -315,7 +333,8 @@ import { User, Notification } from '../../core/models';
     .status-indicator {
       position: absolute;
       bottom: 2px;
-      right: 2px;
+      left: 2px;
+      right: auto;
       width: 10px;
       height: 10px;
       border-radius: 50%;
@@ -498,12 +517,14 @@ export class NavbarComponent implements OnInit, OnDestroy {
   unreadCount = 0;
   notifications: Notification[] = [];
   isFullscreen = false;
+  isDarkMode = true;
 
   private destroy$ = new Subject<void>();
 
   constructor(
     private authService: AuthService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private themeService: ThemeService
   ) {}
 
   ngOnInit(): void {
@@ -519,6 +540,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(notifications => this.notifications = notifications.slice(0, 5));
 
+    this.themeService.theme$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(theme => this.isDarkMode = theme === 'dark');
+
     this.notificationService.getUnreadCount().subscribe();
 
     // Set mock user for demo
@@ -527,9 +552,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
         id: 1,
         username: 'admin',
         email: 'admin@duralux.com',
-        firstName: 'John',
-        lastName: 'Anderson',
-        role: 'Admin' as any,
+        firstName: 'أحمد',
+        lastName: 'محمد',
+        role: 'مدير' as any,
         isActive: true,
         createdAt: new Date()
       };
@@ -538,9 +563,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
     // Set mock notifications for demo
     if (this.notifications.length === 0) {
       this.notifications = [
-        { id: 1, userId: 1, title: 'New order received #ORD-2024-001', message: '', type: 'Order' as any, isRead: false, createdAt: new Date() },
-        { id: 2, userId: 1, title: 'Low stock alert: Monitor 27"', message: '', type: 'Warning' as any, isRead: false, createdAt: new Date(Date.now() - 3600000) },
-        { id: 3, userId: 1, title: 'Payment received $1,250.00', message: '', type: 'Success' as any, isRead: true, createdAt: new Date(Date.now() - 7200000) }
+        { id: 1, userId: 1, title: 'تم استلام طلب جديد #ORD-2024-001', message: '', type: 'Order' as any, isRead: false, createdAt: new Date() },
+        { id: 2, userId: 1, title: 'تنبيه: مخزون منخفض - شاشة 27 بوصة', message: '', type: 'Warning' as any, isRead: false, createdAt: new Date(Date.now() - 3600000) },
+        { id: 3, userId: 1, title: 'تم استلام دفعة بقيمة 1,250.00 ر.س', message: '', type: 'Success' as any, isRead: true, createdAt: new Date(Date.now() - 7200000) }
       ];
       this.unreadCount = 2;
     }
@@ -553,6 +578,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   logout(): void {
     this.authService.logout();
+  }
+
+  toggleTheme(): void {
+    this.themeService.toggleTheme();
   }
 
   markAllAsRead(): void {

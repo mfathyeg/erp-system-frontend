@@ -30,8 +30,8 @@ interface NavGroup {
             <span>D</span>
           </div>
           <div class="logo-text">
-            <span class="brand">Duralux</span>
-            <span class="tagline">ERP System</span>
+            <span class="brand">دورالوكس</span>
+            <span class="tagline">نظام إدارة الموارد</span>
           </div>
         </div>
         <div class="logo-collapsed" *ngIf="collapsed">
@@ -56,7 +56,7 @@ interface NavGroup {
                  [routerLinkActiveOptions]="{exact: item.route === '/dashboard'}"
                  (click)="onNavClick()"
                  [matTooltip]="collapsed ? item.label : ''"
-                 matTooltipPosition="right">
+                 matTooltipPosition="left">
                 <div class="nav-icon">
                   <mat-icon>{{ item.icon }}</mat-icon>
                 </div>
@@ -72,7 +72,7 @@ interface NavGroup {
                    [class.expanded]="item.expanded"
                    (click)="toggleExpand(item)"
                    [matTooltip]="collapsed ? item.label : ''"
-                   matTooltipPosition="right">
+                   matTooltipPosition="left">
                   <div class="nav-icon">
                     <mat-icon>{{ item.icon }}</mat-icon>
                   </div>
@@ -113,7 +113,8 @@ interface NavGroup {
       display: flex;
       flex-direction: column;
       transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      border-right: 1px solid var(--border-color);
+      border-left: 1px solid var(--border-color);
+      border-right: none;
     }
 
     .sidebar.collapsed {
@@ -123,7 +124,7 @@ interface NavGroup {
     /* Logo Section */
     .logo-section {
       padding: 20px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      border-bottom: 1px solid var(--border-color);
     }
 
     .logo {
@@ -212,7 +213,7 @@ interface NavGroup {
     }
 
     .nav-item:hover {
-      background: rgba(255, 255, 255, 0.05);
+      background: var(--card-bg-hover);
       color: var(--text-primary);
     }
 
@@ -233,13 +234,14 @@ interface NavGroup {
       align-items: center;
       justify-content: center;
       border-radius: 8px;
-      background: rgba(255, 255, 255, 0.03);
-      margin-right: 12px;
+      background: var(--secondary-bg);
+      margin-left: 12px;
+      margin-right: 0;
       flex-shrink: 0;
     }
 
     .nav-item.active .nav-icon {
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.25);
     }
 
     .nav-icon mat-icon {
@@ -282,7 +284,8 @@ interface NavGroup {
     }
 
     .nav-children {
-      padding-left: 60px;
+      padding-right: 60px;
+      padding-left: 0;
       margin-top: 4px;
     }
 
@@ -301,7 +304,7 @@ interface NavGroup {
 
     .nav-child:hover {
       color: var(--text-primary);
-      background: rgba(255, 255, 255, 0.03);
+      background: var(--card-bg-hover);
     }
 
     .nav-child.active {
@@ -325,7 +328,7 @@ interface NavGroup {
     /* Sidebar Footer */
     .sidebar-footer {
       padding: 16px;
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      border-top: 1px solid var(--border-color);
       display: flex;
       justify-content: center;
     }
@@ -345,13 +348,14 @@ interface NavGroup {
     }
 
     .collapse-btn:hover {
-      background: rgba(255, 255, 255, 0.05);
+      background: var(--card-bg-hover);
       color: var(--text-primary);
       border-color: var(--primary-color);
     }
 
     /* Collapsed State */
     .sidebar.collapsed .nav-icon {
+      margin-left: 0;
       margin-right: 0;
     }
 
@@ -395,32 +399,32 @@ export class SidebarComponent {
 
   navGroups: NavGroup[] = [
     {
-      title: 'Main Menu',
+      title: 'القائمة الرئيسية',
       items: [
-        { label: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
-        { label: 'Analytics', icon: 'analytics', route: '/dashboard', badge: 3, badgeColor: 'info' }
+        { label: 'لوحة التحكم', icon: 'dashboard', route: '/dashboard' },
+        { label: 'التحليلات', icon: 'analytics', route: '/dashboard', badge: 3, badgeColor: 'info' }
       ]
     },
     {
-      title: 'Management',
+      title: 'الإدارة',
       items: [
-        { label: 'Inventory', icon: 'inventory_2', route: '/inventory' },
+        { label: 'المخزون', icon: 'inventory_2', route: '/inventory' },
         {
-          label: 'Orders',
+          label: 'الطلبات',
           icon: 'shopping_cart',
           route: '/orders',
           badge: 12,
           badgeColor: 'warning'
         },
-        { label: 'Users', icon: 'people', route: '/users', roles: [UserRole.Admin, UserRole.Manager] },
-        { label: 'Finance', icon: 'account_balance_wallet', route: '/finance', roles: [UserRole.Admin, UserRole.Manager] }
+        { label: 'المستخدمين', icon: 'people', route: '/users', roles: [UserRole.Admin, UserRole.Manager] },
+        { label: 'المالية', icon: 'account_balance_wallet', route: '/finance', roles: [UserRole.Admin, UserRole.Manager] }
       ]
     },
     {
-      title: 'Other',
+      title: 'أخرى',
       items: [
-        { label: 'Notifications', icon: 'notifications', route: '/notifications', badge: 5 },
-        { label: 'Settings', icon: 'settings', route: '/configuration', roles: [UserRole.Admin] }
+        { label: 'الإشعارات', icon: 'notifications', route: '/notifications', badge: 5 },
+        { label: 'الإعدادات', icon: 'settings', route: '/configuration', roles: [UserRole.Admin] }
       ]
     }
   ];

@@ -10,22 +10,22 @@ import { Order, OrderStatus, PaginationParams } from '../../../core/models';
   template: `
     <div class="orders-container">
       <app-page-header
-        title="Orders"
-        subtitle="View and manage customer orders"
-        [breadcrumb]="['Dashboard', 'Orders']">
+        title="الطلبات"
+        subtitle="عرض وإدارة طلبات العملاء"
+        [breadcrumb]="['لوحة التحكم', 'الطلبات']">
       </app-page-header>
 
       <div class="content-card">
         <div class="card-toolbar">
           <div class="search-box">
             <mat-icon>search</mat-icon>
-            <input type="text" (keyup)="onSearch($event)" placeholder="Search orders...">
+            <input type="text" (keyup)="onSearch($event)" placeholder="البحث عن الطلبات...">
           </div>
 
           <div class="filters">
             <select (change)="onStatusFilter($any($event.target).value)">
-              <option value="">All Statuses</option>
-              <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+              <option value="">جميع الحالات</option>
+              <option *ngFor="let status of statuses" [value]="status">{{ getStatusArabic(status) }}</option>
             </select>
           </div>
         </div>
@@ -33,14 +33,14 @@ import { Order, OrderStatus, PaginationParams } from '../../../core/models';
         <div class="table-container">
           <table mat-table [dataSource]="orders" matSort (matSortChange)="onSortChange($event)">
             <ng-container matColumnDef="orderNumber">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Order #</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>رقم الطلب</th>
               <td mat-cell *matCellDef="let order">
                 <a class="order-link" (click)="viewOrder(order)">{{ order.orderNumber }}</a>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="customerName">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Customer</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>العميل</th>
               <td mat-cell *matCellDef="let order">
                 <div class="customer-cell">
                   <div class="customer-avatar">{{ order.customerName.charAt(0) }}</div>
@@ -50,35 +50,35 @@ import { Order, OrderStatus, PaginationParams } from '../../../core/models';
             </ng-container>
 
             <ng-container matColumnDef="orderDate">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Order Date</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>تاريخ الطلب</th>
               <td mat-cell *matCellDef="let order">{{ order.orderDate | date:'mediumDate' }}</td>
             </ng-container>
 
             <ng-container matColumnDef="totalAmount">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Total</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>الإجمالي</th>
               <td mat-cell *matCellDef="let order">
                 <span class="amount">{{ order.totalAmount | currencyFormat }}</span>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="status">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>الحالة</th>
               <td mat-cell *matCellDef="let order">
                 <span class="status-badge" [ngClass]="'status-' + order.status.toLowerCase()">
                   <span class="status-dot"></span>
-                  {{ order.status }}
+                  {{ getStatusArabic(order.status) }}
                 </span>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="actions">
-              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <th mat-header-cell *matHeaderCellDef>الإجراءات</th>
               <td mat-cell *matCellDef="let order">
                 <div class="action-buttons">
-                  <button class="action-btn" matTooltip="View Details" (click)="viewOrder(order)">
+                  <button class="action-btn" matTooltip="عرض التفاصيل" (click)="viewOrder(order)">
                     <mat-icon>visibility</mat-icon>
                   </button>
-                  <button class="action-btn" [matMenuTriggerFor]="statusMenu" matTooltip="Update Status">
+                  <button class="action-btn" [matMenuTriggerFor]="statusMenu" matTooltip="تحديث الحالة">
                     <mat-icon>edit</mat-icon>
                   </button>
                   <mat-menu #statusMenu="matMenu" class="status-menu">
@@ -86,7 +86,7 @@ import { Order, OrderStatus, PaginationParams } from '../../../core/models';
                             (click)="updateStatus(order, status)"
                             [disabled]="order.status === status">
                       <span class="menu-status-dot" [ngClass]="'dot-' + status.toLowerCase()"></span>
-                      {{ status }}
+                      {{ getStatusArabic(status) }}
                     </button>
                   </mat-menu>
                 </div>
@@ -100,7 +100,7 @@ import { Order, OrderStatus, PaginationParams } from '../../../core/models';
               <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">
                 <div class="empty-state">
                   <mat-icon>shopping_cart</mat-icon>
-                  <span>No orders found</span>
+                  <span>لا توجد طلبات</span>
                 </div>
               </td>
             </tr>
@@ -433,12 +433,25 @@ export class OrderListComponent implements OnInit {
     });
   }
 
+  getStatusArabic(status: string): string {
+    const statuses: { [key: string]: string } = {
+      Pending: 'قيد الانتظار',
+      Confirmed: 'مؤكد',
+      Processing: 'قيد المعالجة',
+      Shipped: 'تم الشحن',
+      Delivered: 'تم التسليم',
+      Cancelled: 'ملغي',
+      Returned: 'مرتجع'
+    };
+    return statuses[status] || status;
+  }
+
   private getMockOrders(): Order[] {
     return [
-      { id: 1, orderNumber: 'ORD-2024-001', customerId: 1, customerName: 'John Doe', status: OrderStatus.Pending, orderDate: new Date(), totalAmount: 1250.00, shippingAddress: { street: '123 Main St', city: 'New York', state: 'NY', postalCode: '10001', country: 'USA' }, billingAddress: { street: '123 Main St', city: 'New York', state: 'NY', postalCode: '10001', country: 'USA' }, items: [], createdAt: new Date() },
-      { id: 2, orderNumber: 'ORD-2024-002', customerId: 2, customerName: 'Jane Smith', status: OrderStatus.Processing, orderDate: new Date(), totalAmount: 890.50, shippingAddress: { street: '456 Oak Ave', city: 'Los Angeles', state: 'CA', postalCode: '90001', country: 'USA' }, billingAddress: { street: '456 Oak Ave', city: 'Los Angeles', state: 'CA', postalCode: '90001', country: 'USA' }, items: [], createdAt: new Date() },
-      { id: 3, orderNumber: 'ORD-2024-003', customerId: 3, customerName: 'Bob Johnson', status: OrderStatus.Shipped, orderDate: new Date(), totalAmount: 2100.00, shippingAddress: { street: '789 Pine Rd', city: 'Chicago', state: 'IL', postalCode: '60601', country: 'USA' }, billingAddress: { street: '789 Pine Rd', city: 'Chicago', state: 'IL', postalCode: '60601', country: 'USA' }, items: [], createdAt: new Date() },
-      { id: 4, orderNumber: 'ORD-2024-004', customerId: 4, customerName: 'Alice Brown', status: OrderStatus.Delivered, orderDate: new Date(), totalAmount: 450.75, shippingAddress: { street: '321 Elm St', city: 'Houston', state: 'TX', postalCode: '77001', country: 'USA' }, billingAddress: { street: '321 Elm St', city: 'Houston', state: 'TX', postalCode: '77001', country: 'USA' }, items: [], createdAt: new Date() }
+      { id: 1, orderNumber: 'ORD-2024-001', customerId: 1, customerName: 'أحمد محمد', status: OrderStatus.Pending, orderDate: new Date(), totalAmount: 1250.00, shippingAddress: { street: 'شارع الملك فهد', city: 'الرياض', state: 'الرياض', postalCode: '11564', country: 'السعودية' }, billingAddress: { street: 'شارع الملك فهد', city: 'الرياض', state: 'الرياض', postalCode: '11564', country: 'السعودية' }, items: [], createdAt: new Date() },
+      { id: 2, orderNumber: 'ORD-2024-002', customerId: 2, customerName: 'سارة علي', status: OrderStatus.Processing, orderDate: new Date(), totalAmount: 890.50, shippingAddress: { street: 'شارع التحلية', city: 'جدة', state: 'مكة', postalCode: '21442', country: 'السعودية' }, billingAddress: { street: 'شارع التحلية', city: 'جدة', state: 'مكة', postalCode: '21442', country: 'السعودية' }, items: [], createdAt: new Date() },
+      { id: 3, orderNumber: 'ORD-2024-003', customerId: 3, customerName: 'خالد عبدالله', status: OrderStatus.Shipped, orderDate: new Date(), totalAmount: 2100.00, shippingAddress: { street: 'شارع الأمير سلطان', city: 'الدمام', state: 'الشرقية', postalCode: '31411', country: 'السعودية' }, billingAddress: { street: 'شارع الأمير سلطان', city: 'الدمام', state: 'الشرقية', postalCode: '31411', country: 'السعودية' }, items: [], createdAt: new Date() },
+      { id: 4, orderNumber: 'ORD-2024-004', customerId: 4, customerName: 'نورة سعيد', status: OrderStatus.Delivered, orderDate: new Date(), totalAmount: 450.75, shippingAddress: { street: 'شارع العليا', city: 'الرياض', state: 'الرياض', postalCode: '11564', country: 'السعودية' }, billingAddress: { street: 'شارع العليا', city: 'الرياض', state: 'الرياض', postalCode: '11564', country: 'السعودية' }, items: [], createdAt: new Date() }
     ];
   }
 }

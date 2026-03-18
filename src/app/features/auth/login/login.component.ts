@@ -16,41 +16,41 @@ import { NotificationService } from '../../../core/services/notification.service
               <span>D</span>
             </div>
             <div class="logo-text">
-              <span class="brand">Duralux</span>
-              <span class="tagline">ERP System</span>
+              <span class="brand">دورالوكس</span>
+              <span class="tagline">نظام إدارة الموارد</span>
             </div>
           </div>
 
           <!-- Welcome Text -->
           <div class="welcome-section">
-            <h1>Welcome Back</h1>
-            <p>Sign in to your account to continue</p>
+            <h1>مرحباً بعودتك</h1>
+            <p>قم بتسجيل الدخول للمتابعة</p>
           </div>
 
           <!-- Login Form -->
           <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
             <div class="form-group">
-              <label>Username</label>
+              <label>اسم المستخدم</label>
               <div class="input-wrapper">
                 <mat-icon>person_outline</mat-icon>
-                <input type="text" formControlName="username" placeholder="Enter your username">
+                <input type="text" formControlName="username" placeholder="أدخل اسم المستخدم">
               </div>
               <span class="error-text" *ngIf="loginForm.get('username')?.hasError('required') && loginForm.get('username')?.touched">
-                Username is required
+                اسم المستخدم مطلوب
               </span>
             </div>
 
             <div class="form-group">
-              <label>Password</label>
+              <label>كلمة المرور</label>
               <div class="input-wrapper">
                 <mat-icon>lock_outline</mat-icon>
-                <input [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="Enter your password">
+                <input [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="أدخل كلمة المرور">
                 <button type="button" class="toggle-password" (click)="hidePassword = !hidePassword">
                   <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
                 </button>
               </div>
               <span class="error-text" *ngIf="loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched">
-                Password is required
+                كلمة المرور مطلوبة
               </span>
             </div>
 
@@ -58,38 +58,38 @@ import { NotificationService } from '../../../core/services/notification.service
               <label class="checkbox-wrapper">
                 <input type="checkbox" formControlName="rememberMe">
                 <span class="checkmark"></span>
-                <span class="label-text">Remember me</span>
+                <span class="label-text">تذكرني</span>
               </label>
-              <a href="#" class="forgot-link">Forgot password?</a>
+              <a href="#" class="forgot-link">نسيت كلمة المرور؟</a>
             </div>
 
             <button type="submit" class="btn-login" [disabled]="loginForm.invalid || isLoading">
               <div class="spinner" *ngIf="isLoading"></div>
-              <span *ngIf="!isLoading">Sign In</span>
+              <span *ngIf="!isLoading">تسجيل الدخول</span>
             </button>
           </form>
 
           <!-- Divider -->
           <div class="divider">
-            <span>or continue with</span>
+            <span>أو تابع باستخدام</span>
           </div>
 
           <!-- Social Login -->
           <div class="social-login">
             <button class="social-btn google">
               <mat-icon>g_mobiledata</mat-icon>
-              Google
+              جوجل
             </button>
             <button class="social-btn microsoft">
               <mat-icon>window</mat-icon>
-              Microsoft
+              مايكروسوفت
             </button>
           </div>
         </div>
 
         <!-- Footer -->
         <p class="footer-text">
-          &copy; {{ currentYear }} Duralux ERP System. All rights reserved.
+          &copy; {{ currentYear }} نظام دورالوكس ERP. جميع الحقوق محفوظة.
         </p>
       </div>
 
@@ -507,7 +507,7 @@ export class LoginComponent implements OnInit {
 
     this.authService.login({ username, password }).subscribe({
       next: () => {
-        this.notificationService.showSuccess('Login successful!');
+        this.notificationService.showSuccess('تم تسجيل الدخول بنجاح!');
         this.router.navigateByUrl(this.returnUrl);
       },
       error: () => {
